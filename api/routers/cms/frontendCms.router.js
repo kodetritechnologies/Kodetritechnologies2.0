@@ -1,0 +1,36 @@
+import express from "express";
+const router = express.Router();
+import { createContact } from "../../controllers/cms/contact.controller.js";
+import { getFrontendGalleryBySlug } from "../../controllers/cms/gallery.controller.js";
+import {
+  getPostsBySlug,
+  getPostsByType,
+} from "../../controllers/cms/post.controller.js";
+import { getFrontendSlidersBySlug } from "../../controllers/cms/slider.controller.js";
+import { getFrontendTestimonialByType } from "../../controllers/cms/testimonial.controller.js";
+import { getFrontendFaqBySlug } from "../../controllers/cms/faq.controller.js";
+
+// contact us
+router.post("/contact/create", createContact);
+
+// Gallery
+router.get("/gallery/:slug", getFrontendGalleryBySlug);
+
+// Posts
+
+router.get("/posts/type/:type", getPostsByType);
+router.get("/posts/:slug", getPostsBySlug);
+
+// slider
+
+router.get("/slider/:slug", getFrontendSlidersBySlug);
+
+// Testimonial
+
+router.get("/testimonial/type/:type", getFrontendTestimonialByType);
+
+// Faqs
+
+router.get("/faqs/:slug", getFrontendFaqBySlug);
+
+export default router;
