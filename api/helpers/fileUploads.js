@@ -1,14 +1,26 @@
 import multer from "multer";
-import { v2 as cloudinary } from "cloudinary";
 import File from "../models/file.schema.js";
+import fs from "fs";
+import path from "path";
 
-cloudinary.config({
-  cloud_name: process.env.cloud_name,
-  api_key: process.env.cloud_api_key,
-  api_secret: process.env.cloud_secret,
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, "0");
+    const day = String(now.getDate()).padStart(2, "0");
+    const uploadPath = path.join("public", "uploads", `${year}`, `${month}`, `${day}`);
+
+    if (!fs.existsSync(uploadPath)) {
+      fs.mkdirSync(uploadPath, { recursive: true });
+    }
+    cb(null, uploadPath);
+  },
+  filename: function (req, file, cb) {
+    cb(null, Date.now() + "-" + file.originalname);
+  },
 });
 
-const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
 export const uploadMiddleware = upload.fields([
@@ -17,33 +29,23 @@ export const uploadMiddleware = upload.fields([
   { name: "document", maxCount: 30 },
 ]);
 
-const uploadToCloudinary = (file) => {
-  return new Promise((resolve, reject) => {
-    const stream = cloudinary.uploader.upload_stream(
-      {
-        use_filename: true,
-        unique_filename: false,
-        overwrite: true,
-        resource_type: "auto",
-      },
-      (error, result) => {
-        if (error) reject(error);
-        else resolve(result);
-      }
-    );
-    stream.end(file.buffer);
-  });
-};
-
-const generatePayload = (req, file, cloudinaryFile) => {
+const generatePayload = (req, file) => {
   const { _id } = req.admin || {};
   const customer = req.customer;
+
+  // Construct the URL based on the file path relative to 'public'
+  // The file.path is 'public\\uploads\\2025\\12\\20\\filename.jpg' (on Windows)
+  // We need to convert it to a URL path: '/uploads/2025/12/20/filename.jpg'
+
+  const relativePath = file.path.replace(/\\/g, "/").replace("public/", "");
+  const fullUrl = `${req.protocol}://${req.get("host")}/${relativePath}`;
+
   return {
     filename: file.originalname,
     fieldname: file.fieldname,
     encoding: file.encoding,
     mimetype: file.mimetype,
-    url: cloudinaryFile?.secure_url,
+    url: fullUrl,
     admin: _id || null,
     customer: customer?._id || null,
   };
@@ -52,11 +54,10 @@ const generatePayload = (req, file, cloudinaryFile) => {
 export const fileUploads = async (req) => {
   let fields = req.files;
   const uploadedFiles = {};
-  if (fields["featured_image"]) {
+  if (fields && fields["featured_image"]) {
     const file = fields?.featured_image[0];
     try {
-      const cloudinaryFile = await uploadToCloudinary(file);
-      const payload = generatePayload(req, file, cloudinaryFile);
+      const payload = generatePayload(req, file);
       if (payload) {
         const response = await File.create(payload);
         uploadedFiles.featured_image = response;
@@ -65,11 +66,10 @@ export const fileUploads = async (req) => {
       console.log(error);
     }
   }
-  if (fields["gallery"]) {
+  if (fields && fields["gallery"]) {
     const result = await Promise.all(
       fields.gallery.map(async (file) => {
-        const cloudinaryFile = await uploadToCloudinary(file);
-        const payload = generatePayload(req, file, cloudinaryFile);
+        const payload = generatePayload(req, file);
         const response = await File.create(payload);
         return response;
       })
@@ -77,11 +77,10 @@ export const fileUploads = async (req) => {
     uploadedFiles.gallery = result;
   }
 
-  if (fields["document"]) {
+  if (fields && fields["document"]) {
     const result = await Promise.all(
       fields.document.map(async (file) => {
-        const cloudinaryFile = await uploadToCloudinary(file);
-        const payload = generatePayload(req, file, cloudinaryFile);
+        const payload = generatePayload(req, file);
         const response = await File.create(payload);
         return response;
       })

@@ -35,6 +35,7 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
+app.use(expres.static("public"));
 
 app.get("/api", (req, res) => {
   res.send(`${process.env.APP_NAME} api is running...`);

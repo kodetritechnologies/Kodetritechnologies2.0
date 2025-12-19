@@ -5,6 +5,7 @@ import { AiOutlineClose } from "react-icons/ai";
 import handleSubmitHelper from "../../../helpers/handleSubmitHelper";
 import BasicProvider from "../../../authentications/BasicProvider";
 import { useNavigate, useParams } from "react-router-dom";
+import { YYYYMMDD } from "../../../helpers/dateHelper";
 import toast from "react-hot-toast";
 
 function Create() {
@@ -14,7 +15,7 @@ function Create() {
   const [initialValues, setInitialValues] = useState({
     title: "",
     slug: "",
-    publish_date: "",
+    publish_date: YYYYMMDD(new Date()),
     values: [
       {
         ques: "",

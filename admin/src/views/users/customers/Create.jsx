@@ -5,6 +5,7 @@ import BasicProvider from "../../../authentications/BasicProvider";
 import handleSubmitHelper from "../../../helpers/handleSubmitHelper";
 import toast from "react-hot-toast";
 import { useNavigate, useParams } from "react-router-dom";
+import { YYYYMMDD } from "../../../helpers/dateHelper";
 
 function Create() {
   const basicProvider = BasicProvider();
@@ -42,7 +43,7 @@ function Create() {
     password: "",
     confpassword: "",
     gender: "",
-    dob: "",
+    dob: YYYYMMDD(new Date()),
     status: "",
     featured_image: null,
   });
@@ -200,9 +201,8 @@ function Create() {
                     id="confpassword"
                     name="confpassword"
                     value={initialValues.confpassword}
-                    className={`input ${
-                      error.confpassword && "customeErrorInput"
-                    }`}
+                    className={`input ${error.confpassword && "customeErrorInput"
+                      }`}
                     placeholder="Reconfirm Your Password"
                     onChange={handleChange}
                   />

@@ -3,6 +3,7 @@ import TableLayoutComp from "../../../components/Tables/TableLayoutComp";
 import handleSubmitHelper from "../../../helpers/handleSubmitHelper";
 import BasicProvider from "../../../authentications/BasicProvider";
 import { useNavigate, useParams } from "react-router-dom";
+import { YYYYMMDD } from "../../../helpers/dateHelper";
 import toast from "react-hot-toast";
 import FileUplodsModule from "../../../components/modules/FileUplodsModule";
 
@@ -18,7 +19,7 @@ function Create() {
     slug: "",
     rating: "",
     description: "",
-    publish_date: "",
+    publish_date: YYYYMMDD(new Date()),
     type: "",
     featured_image: null,
   });

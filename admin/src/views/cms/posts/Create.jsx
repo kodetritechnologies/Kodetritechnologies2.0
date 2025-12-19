@@ -3,6 +3,7 @@ import FileUplodsModule from "../../../components/modules/FileUplodsModule";
 import TableLayoutComp from "../../../components/Tables/TableLayoutComp";
 import JoditTextEditor from "../../../components/textEditor/JoditTextEditor";
 import { useNavigate, useParams } from "react-router-dom";
+import { YYYYMMDD } from "../../../helpers/dateHelper";
 import BasicProvider from "../../../authentications/BasicProvider";
 import { useEffect } from "react";
 import handleSubmitHelper from "../../../helpers/handleSubmitHelper";
@@ -14,7 +15,7 @@ function Create() {
   const basicProvider = BasicProvider();
   const [image, setImage] = useState(null);
   const [types, setTypes] = useState([]);
-  console.log("types", types);
+
 
   const [initialValues, setInitialValues] = useState({
     title: "",
@@ -22,7 +23,7 @@ function Create() {
     content: "",
     featured: false,
     type: "post",
-    publish_date: "",
+    publish_date: YYYYMMDD(new Date()),
     featured_image: null,
   });
 
@@ -58,8 +59,8 @@ function Create() {
         );
       } else {
         response = await basicProvider.postMethod("cms/post/create", data);
-        if (response.data) {
-          navigate(`/cms/post/${response?.data?._id}/edit`);
+        if (response.data && response.data._id) {
+          navigate(`/cms/post/${response.data._id}/edit`);
         }
       }
     }
@@ -73,7 +74,7 @@ function Create() {
   };
 
   useEffect(() => {
-    if (id) {
+    if (id && id !== "undefined") {
       fetchData();
     }
     fetchTypes();

@@ -10,8 +10,8 @@ import { MdDelete } from "react-icons/md";
 import { AiOutlineClose } from "react-icons/ai";
 import handleSubmitHelper from "../../../helpers/handleSubmitHelper";
 import { useNavigate, useParams } from "react-router-dom";
-import toast from "react-hot-toast";
 import { YYYYMMDD } from "../../../helpers/dateHelper";
+
 import VarientFileUploadModule from "../../../components/modules/VarientFileUploadModule";
 
 function Create() {
@@ -77,7 +77,7 @@ function Create() {
     categories: [],
     featured_image: "",
     gallery: [],
-    publish: "",
+    publish: YYYYMMDD(new Date()),
     featured: false,
     hot: false,
     type: "simple",
