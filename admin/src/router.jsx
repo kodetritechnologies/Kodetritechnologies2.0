@@ -191,8 +191,22 @@ const router = createBrowserRouter([
       { path: "*", element: <NotFoundPage /> },
     ],
   },
-  { path: "/signup", element: <Signup />, protected: true },
-  { path: "/login", element: <Login />, protected: true },
+  {
+    path: "/signup",
+    element: (
+      <ProtectedRoutes>
+        <Signup />
+      </ProtectedRoutes>
+    ),
+  },
+  {
+    path: "/login",
+    element: (
+      <ProtectedRoutes>
+        <Login />
+      </ProtectedRoutes>
+    ),
+  },
 
   { path: "*", element: <NotFoundPage /> },
 ]);

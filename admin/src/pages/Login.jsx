@@ -1,7 +1,7 @@
 import { IoMdEye, IoMdEyeOff } from "react-icons/io";
 import googlecon from "../assets/icons/google.png";
 import { useContext, useState } from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import handleSubmitHelper from "../helpers/handleSubmitHelper";
 import BasicProvider from "../authentications/BasicProvider";
@@ -9,6 +9,7 @@ import { AuthContext } from "../contexts/AuthContext";
 function Login() {
   const { setAdmin } = useContext(AuthContext);
   const basicProvider = BasicProvider();
+  const navigate = useNavigate();
   const [show, setShow] = useState(false);
   const validation = [
     {
@@ -57,6 +58,7 @@ function Login() {
             password: "",
             term: false,
           });
+          navigate("/");
         } else {
           toast.error(response.message);
         }
@@ -98,9 +100,8 @@ function Login() {
               Password
             </label>
             <div
-              className={`input-password ${
-                error.password && "customeErrorInput"
-              }`}
+              className={`input-password ${error.password && "customeErrorInput"
+                }`}
             >
               <input
                 type={show ? "text" : "password"}

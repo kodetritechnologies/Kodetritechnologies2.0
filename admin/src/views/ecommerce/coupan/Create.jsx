@@ -2,6 +2,7 @@ import { useState } from "react";
 import SubHeader from "../../../components/SubHeader";
 import TableLayoutComp from "../../../components/Tables/TableLayoutComp";
 import { useNavigate, useParams } from "react-router-dom";
+import { YYYYMMDD } from "../../../helpers/dateHelper";
 import BasicProvider from "../../../authentications/BasicProvider";
 import { useEffect } from "react";
 import toast from "react-hot-toast";
@@ -21,8 +22,8 @@ function Create() {
     discount_type: "",
     min_amount: "",
     max_amount: "",
-    start_date: "",
-    end_date: "",
+    start_date: YYYYMMDD(new Date()),
+    end_date: YYYYMMDD(new Date()),
     type: "",
     one_time: true,
   });

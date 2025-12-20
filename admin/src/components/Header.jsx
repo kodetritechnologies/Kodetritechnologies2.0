@@ -1,4 +1,4 @@
-import { useContext, useState } from "react";
+import { useContext, useState, useRef, useEffect } from "react";
 import { CgProfile } from "react-icons/cg";
 import toast from "react-hot-toast";
 import { NavLink } from "react-router-dom";
@@ -10,6 +10,26 @@ function Header() {
   const { admin, setAdmin, website } = useContext(AuthContext);
   const basicProvider = BasicProvider();
   const [show, setShow] = useState(false);
+  const dropdownRef = useRef(null);
+  const imgRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      // If drop down is not shown, or if click is inside dropdown, or if click is on the profile image (toggle button), return
+      if (!show ||
+        (dropdownRef.current && dropdownRef.current.contains(event.target)) ||
+        (imgRef.current && imgRef.current.contains(event.target))) {
+        return;
+      }
+      setShow(false);
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [show]);
+
   const handelLogout = async () => {
     try {
       const response = await basicProvider.getMethod("users/admin/logout");
@@ -40,6 +60,7 @@ function Header() {
           </div>
         )}
         <img
+          ref={imgRef}
           onClick={handleDropDown}
           style={{
             objectFit: "cover",
@@ -51,6 +72,7 @@ function Header() {
           alt="not found"
         />
         <div
+          ref={dropdownRef}
           className="dropdown"
           style={{ display: `${show ? "inline-block" : "none"}` }}
         >

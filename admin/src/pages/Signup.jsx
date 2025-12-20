@@ -1,12 +1,13 @@
 import { IoMdEye, IoMdEyeOff } from "react-icons/io";
 import googlecon from "../assets/icons/google.png";
 import { useContext, useEffect, useState } from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import BasicProvider from "../authentications/BasicProvider";
 import handleSubmitHelper from "../helpers/handleSubmitHelper";
 import toast from "react-hot-toast";
 function Signup() {
   const basicProvider = BasicProvider();
+  const navigate = useNavigate();
 
   const validation = [
     {
@@ -76,6 +77,7 @@ function Signup() {
             confirmPass: "",
             term: false,
           });
+          navigate("/login");
         } else {
           toast.error(response.message);
         }
@@ -134,9 +136,8 @@ function Signup() {
               Password
             </label>
             <div
-              className={`input-password ${
-                error.password && "customeErrorInput"
-              }`}
+              className={`input-password ${error.password && "customeErrorInput"
+                }`}
             >
               <input
                 type={show.password ? "text" : "password"}
