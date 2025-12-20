@@ -36,8 +36,9 @@ const customerScheam = new mongoose.Schema(
       ref: "File",
     },
     status: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Status",
+      type: String,
+      enum: ["active", "inactive", "blocked"],
+      default: "active",
     },
     admin: {
       type: mongoose.Schema.Types.ObjectId,

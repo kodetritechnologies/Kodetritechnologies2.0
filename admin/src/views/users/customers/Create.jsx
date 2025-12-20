@@ -32,7 +32,6 @@ function Create() {
       maxLength: 8,
     },
   ];
-  const [status, setStatus] = useState([]);
   const [error, setError] = useState({});
   const [image, setImage] = useState(null);
   const [initialValues, setInitialValues] = useState({
@@ -47,18 +46,11 @@ function Create() {
     featured_image: null,
   });
 
+  console.log("initialValues", initialValues);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setInitialValues((pre) => ({ ...pre, [name]: value }));
-  };
-
-  const fetchStatus = async () => {
-    const response = await basicProvider.getMethod(
-      `configuration/status/type/account`
-    );
-    if (response.status === "success") {
-      setStatus(response.data);
-    }
   };
 
   const fetchData = async () => {
@@ -106,10 +98,6 @@ function Create() {
       console.log(error);
     }
   };
-
-  useEffect(() => {
-    fetchStatus();
-  }, []);
 
   useEffect(() => {
     if (id) {
@@ -282,24 +270,46 @@ function Create() {
               </div>
               <div className="cmt">
                 <div>Status</div>
+
                 <div className="flex gap-5">
-                  {status?.map((sta, idx) => (
-                    <span className="flex items-center gap-2" key={idx}>
-                      <input
-                        type="radio"
-                        id={sta?.name}
-                        name="status"
-                        value={sta?._id}
-                        onChange={handleChange}
-                        checked={initialValues.status === sta._id}
-                      />
-                      <label htmlFor={sta?.name} className="label">
-                        {sta?.name}
-                      </label>
-                    </span>
-                  ))}
+                  <div className="flex items-center gap-2">
+                    <label htmlFor="active">Active</label>
+                    <input
+                      type="radio"
+                      name="status"
+                      value="active"
+                      id="active"
+                      checked={initialValues.status === "active"}
+                      onChange={handleChange}
+                    />
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <label htmlFor="inactive">Inactive</label>
+                    <input
+                      type="radio"
+                      name="status"
+                      value="inactive"
+                      id="inactive"
+                      checked={initialValues.status === "inactive"}
+                      onChange={handleChange}
+                    />
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <label htmlFor="blocked">Blocked</label>
+                    <input
+                      type="radio"
+                      name="status"
+                      value="blocked"
+                      id="blocked"
+                      checked={initialValues.status === "blocked"}
+                      onChange={handleChange}
+                    />
+                  </div>
                 </div>
               </div>
+
               <div className="flex gap-4 cp cmt">
                 <button className="submit" onClick={handelSubmit}>
                   Submit

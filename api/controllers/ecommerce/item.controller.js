@@ -142,7 +142,7 @@ export const createItem = async (req, res) => {
     return res.status(201).json({
       status: "success",
       message: "Item create successfully",
-      data: response,
+      data: item,
     });
   } catch (error) {
     return res.status(500).json({

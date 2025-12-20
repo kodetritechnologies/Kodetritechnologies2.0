@@ -1,12 +1,12 @@
 import mongoose from "mongoose";
-import { generateOptions } from "../../helpers/mongooseHelper.js";
 import Cart from "../../models/ecommerce/cart.schema.js";
+import { generateOptions } from "../../helpers/mongooseHelper.js";
 
 // Frontend Controller
 
 export const getCustomerCart = async (req, res) => {
   try {
-    const { _id,  } = req.customer;
+    const { _id } = req.customer;
     const query = {
       customer: new mongoose.Types.ObjectId(_id),
       deletedAt: null,
@@ -60,17 +60,29 @@ export const getCustomerCart = async (req, res) => {
 
 export const addTocartCustomer = async (req, res) => {
   try {
-    const { _id,  } = req.customer;
+    const { _id } = req.customer;
     const body = req.body;
 
     const payload = {
       customer: _id,
-
       itemId: body.itemId,
       variantId: body.variantId,
       price: body.price,
       quantity: body.quantity,
     };
+
+    const alreadyExists = await Cart.findOne({
+      customer: _id,
+      itemId: body.itemId,
+      variantId: body.variantId,
+    });
+
+    if (alreadyExists) {
+      return res.status(409).json({
+        status: "error",
+        message: "Item already exists in cart. Please update quantity.",
+      });
+    }
 
     await Cart.create(payload);
     return res.status(201).json({
@@ -88,14 +100,13 @@ export const addTocartCustomer = async (req, res) => {
 
 export const updateCartCustomer = async (req, res) => {
   try {
-    const { _id,  } = req.customer;
+    const { _id } = req.customer;
     const { id } = req.params;
     const { quantity } = req.body;
 
     const query = {
       _id: id,
       customer: _id,
-
       deletedAt: null,
     };
 
@@ -133,7 +144,7 @@ export const updateCartCustomer = async (req, res) => {
 
 export const removeToCartCustomer = async (req, res) => {
   try {
-    const { _id,  } = req.customer;
+    const { _id } = req.customer;
     const { id } = req.params;
     const query = {
       _id: id,
@@ -144,6 +155,32 @@ export const removeToCartCustomer = async (req, res) => {
     return res.status(201).json({
       status: "success",
       message: "Item removed from cart successfully",
+    });
+  } catch (error) {
+    return res.status(500).json({
+      status: "error",
+      message: "Internal server error",
+      error: error.message,
+    });
+  }
+};
+
+// admin
+
+export const getAllAdminCustomerCart = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const query = {
+      customer: id,
+      deletedAt: null,
+    };
+
+    const options = generateOptions(req);
+    const response = await Cart.paginate(query, options);
+    return res.status(200).json({
+      status: "success",
+      message: "Customer cart fetched successfully",
+      data: response,
     });
   } catch (error) {
     return res.status(500).json({

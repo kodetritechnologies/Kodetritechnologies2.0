@@ -139,6 +139,7 @@ export const CustomerUpdate = async (req, res) => {
 export const adminCustomerCreate = async (req, res) => {
   try {
     const { name, email, password } = req.body;
+    const { _id } = req.admin;
 
     if (!name) {
       return res

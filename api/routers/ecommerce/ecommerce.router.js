@@ -52,6 +52,7 @@ import {
   getCustomerAddressById,
   updateAdminCustomerAddress,
 } from "../../controllers/ecommerce/address.controller.js";
+import { getAllAdminCustomerCart } from "../../controllers/ecommerce/cart.controller.js";
 
 // Item routes
 
@@ -153,5 +154,9 @@ router.delete(
   adminAuthMiddleware,
   deleteAdminCustomerAddress
 );
+
+// Cart
+
+router.get("/cart/:id", adminAuthMiddleware, getAllAdminCustomerCart);
 
 export default router;

@@ -1,5 +1,6 @@
 import Address from "./Address";
 import AddressDetails from "./AddressDetails";
+import Cart from "./Cart";
 import Coupon from "./Coupon";
 import Create from "./Create";
 import CustomerDashboard from "./CustomerDashboard";
@@ -28,6 +29,10 @@ export const customerRouter = [
   {
     path: "wishlist",
     element: <Wishlist />,
+  },
+  {
+    path: "cart",
+    element: <Cart />,
   },
   {
     path: "addresses",
