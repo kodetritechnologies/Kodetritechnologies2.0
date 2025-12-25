@@ -1,6 +1,6 @@
 import { Worker } from "bullmq";
-import sendEmail from "../mailer";
-import redisClient from "../Redis/redisClient";
+import sendEmail from "../mailer.js";
+import redisClient from "../Redis/redisClient.js";
 
 const worker = new Worker(
   "sendEmail",

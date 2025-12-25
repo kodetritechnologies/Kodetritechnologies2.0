@@ -2,6 +2,8 @@ import expres from "express";
 import "dotenv/config";
 import useragent from "express-useragent";
 import "./DATABASE.js";
+import "./Redis/redisClient.js";
+import "./Jobs/worker.js";
 const app = expres();
 const PORT = process.env.PORT || 5000;
 import bodyParser from "body-parser";

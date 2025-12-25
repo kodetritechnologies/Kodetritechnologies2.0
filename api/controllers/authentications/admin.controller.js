@@ -49,9 +49,7 @@ export const adminSignup = async (req, res) => {
 export const adminLogin = async (req, res) => {
   try {
     const { email, password } = req.body;
-    console.log(await Admin.find({}));
     const isExistAdmin = await Admin.findOne({ email: email });
-    console.log("isExistAdmin", isExistAdmin);
 
     if (!isExistAdmin) {
       return res.status(404).json({
