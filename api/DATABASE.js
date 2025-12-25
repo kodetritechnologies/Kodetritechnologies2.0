@@ -1,9 +1,7 @@
 import mongoose from "mongoose";
-// mongoose.connect(
-//   `mongodb+srv://${process.env.DB_USERNAME}:${process.env.DB_PASS}@kodetritechnologies.o4cvr9a.mongodb.net/${process.env.DB_NAME}?retryWrites=true&w=majority&appName=Kodetritechnologies`
-// );
-
-mongoose.connect(process.env.MONGO_URI)
+mongoose.connect(
+  `mongodb+srv://${process.env.DB_USERNAME}:${process.env.DB_PASS}@kodetritechnologies.o4cvr9a.mongodb.net/${process.env.DB_NAME}?retryWrites=true&w=majority&appName=Kodetritechnologies`
+);
 
 const db = mongoose.connection;
 

@@ -21,6 +21,9 @@ import PublicCmsRouter from "./routers/cms/frontendCms.router.js";
 import SupportRouter from "./routers/support/frontendSupportTicket.router.js";
 import PublicConfigurationRouter from "./routers/configuration/frontend.setting.master.router.js";
 
+// import  cronStart from "./cron/index.js";
+// cronStart()
+
 app.use(useragent.express());
 app.set("trust proxy", true);
 app.use(bodyParser.json());
