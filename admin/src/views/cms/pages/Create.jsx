@@ -1,9 +1,22 @@
+import { useState } from "react";
 import FileUplodsModule from "../../../components/modules/FileUplodsModule";
 import SubHeader from "../../../components/SubHeader";
 import TableLayoutComp from "../../../components/Tables/TableLayoutComp";
 import GridEditor from "../../../components/textEditor/GridEditor";
 
 function Create() {
+  const [formData, setFormData] = useState({
+    name: "",
+    content: "",
+    publishDate: "2025-08-19",
+    template: "",
+    slug: "",
+  });
+
+  const handleEditorChange = (newContent) => {
+    setFormData((prev) => ({ ...prev, content: newContent }));
+  };
+
   return (
     <div>
       <SubHeader searchFilter={false}></SubHeader>
@@ -20,13 +33,20 @@ function Create() {
                   className="input"
                   id="name"
                   placeholder="Enter Title"
+                  value={formData.name}
+                  onChange={(e) =>
+                    setFormData({ ...formData, name: e.target.value })
+                  }
                 />
               </div>
               <div>
                 <label htmlFor="content" className="label">
                   Content<span className="span">*</span>
                 </label>
-                <GridEditor />
+                <GridEditor
+                  value={formData.content}
+                  onChange={handleEditorChange}
+                />
               </div>
             </div>
           </TableLayoutComp>
@@ -42,15 +62,26 @@ function Create() {
                   type="text"
                   className="input"
                   id="date"
-                  value="2025-08-19"
+                  value={formData.publishDate}
+                  onChange={(e) =>
+                    setFormData({ ...formData, publishDate: e.target.value })
+                  }
                 />
               </div>
               <div>
                 <label htmlFor="template" className="label">
                   Template
                 </label>
-                <select name="template" id="template" className="input">
-                  <option value="" selected disabled>
+                <select
+                  name="template"
+                  id="template"
+                  className="input"
+                  value={formData.template}
+                  onChange={(e) =>
+                    setFormData({ ...formData, template: e.target.value })
+                  }
+                >
+                  <option value="" disabled>
                     Select Template
                   </option>
                 </select>
@@ -63,12 +94,20 @@ function Create() {
           </TableLayoutComp>
           <TableLayoutComp title={"Slug"}>
             <div className="cp">
-              <input type="text" className="input" placeholder="Slug" />
+              <input
+                type="text"
+                className="input"
+                placeholder="Slug"
+                value={formData.slug}
+                onChange={(e) =>
+                  setFormData({ ...formData, slug: e.target.value })
+                }
+              />
             </div>
           </TableLayoutComp>
           <TableLayoutComp title={"Featured Image"}>
             <div className="cp">
-              {/* <FileUplodsModule /> */}
+              <FileUplodsModule />
             </div>
           </TableLayoutComp>
         </div>
