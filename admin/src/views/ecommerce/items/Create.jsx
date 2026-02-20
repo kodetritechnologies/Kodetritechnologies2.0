@@ -376,7 +376,6 @@ function Create() {
     }
   }, [id]);
 
-  console.log(initialValues);
 
   useEffect(() => {
     fetchCategory();

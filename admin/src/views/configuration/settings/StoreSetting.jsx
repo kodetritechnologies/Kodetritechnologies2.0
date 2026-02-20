@@ -6,7 +6,8 @@ import toast from "react-hot-toast";
 
 function StoreSetting() {
   const basicProvider = BasicProvider();
-  const [tax, setTax] = useState("");
+  const [tax, setTax] = useState(0);
+  const [shipping, setShipping] = useState(0);
   const [dropship, setDropship] = useState(false);
   const [cod, setCod] = useState(false);
   const [commission, setCommission] = useState();
@@ -23,6 +24,7 @@ function StoreSetting() {
       setCod(response.data.value.cod);
       setCommission(response.data.value.commission);
       setDuration(response.data.value.duration);
+      setShipping(response.data.value.shipping);
     }
   };
   useEffect(() => {
@@ -31,9 +33,13 @@ function StoreSetting() {
     fetchData("cod");
     fetchData("commission");
     fetchData("duration");
+    fetchData("shipping");
   }, []);
   const handleTaxChange = (e) => {
     setTax(e.target.value);
+  };
+  const handleShippingChange = (e) => {
+    setShipping(e.target.value);
   };
   const handleCommissionChange = (e) => {
     setCommission(e.target.value);
@@ -75,7 +81,7 @@ function StoreSetting() {
                 Tax (%)
               </label>
               <input
-                type="text"
+                type="number"
                 className="input"
                 name="tax"
                 value={tax}
@@ -88,6 +94,32 @@ function StoreSetting() {
               <button
                 className="submit"
                 onClick={() => handleSubmit({ tax }, "tax")}
+              >
+                Submit
+              </button>
+            </div>
+          </div>
+        </TableLayoutComp>
+        <TableLayoutComp title={"Shipping"}>
+          <div className="taxcard cp">
+            <div>
+              <label htmlFor="shipping" className="label">
+                Shipping Charges
+              </label>
+              <input
+                type="number"
+                className="input"
+                name="shipping"
+                value={shipping}
+                id="shipping"
+                placeholder="Enter shipping charges"
+                onChange={handleShippingChange}
+              />
+            </div>
+            <div className="cmt">
+              <button
+                className="submit"
+                onClick={() => handleSubmit({ shipping }, "shipping")}
               >
                 Submit
               </button>

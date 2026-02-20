@@ -47,7 +47,7 @@ function All() {
   const HeaderNavigation = [
     {
       name: "All Mail Logs",
-      link: "/customer/all",
+      link: "/log/mail-logs",
       icon: <FaRectangleList />,
     },
   ];

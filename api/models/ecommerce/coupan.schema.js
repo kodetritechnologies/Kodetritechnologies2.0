@@ -14,6 +14,18 @@ const coupanSchema = new mongoose.Schema(
     code: {
       type: String,
     },
+    items: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Item",
+      },
+    ],
+    categories: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Categories",
+      },
+    ],
     coupan_no: {
       type: String,
     },
@@ -21,10 +33,10 @@ const coupanSchema = new mongoose.Schema(
       type: String,
     },
     min_amount: {
-      type: String,
+      type: Number,
     },
     max_amount: {
-      type: String,
+      type: Number,
     },
     start_date: {
       type: Date,
@@ -51,6 +63,18 @@ const coupanSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
+
+coupanSchema.pre("find", function (next) {
+  this.populate("items");
+  this.populate("categories");
+  next();
+});
+
+coupanSchema.pre("findOne", function (next) {
+  this.populate("items");
+  this.populate("categories");
+  next();
+});
 
 coupanSchema.plugin(mongoosePaginate);
 const Coupan = mongoose.model("Coupan", coupanSchema);

@@ -8,6 +8,8 @@ import {
 import { slugGenerator } from "../../helpers/slugGenerator.js";
 import Coupan from "../../models/ecommerce/coupan.schema.js";
 import CoupanClaim from "../../models/ecommerce/CouponClaim.js";
+import Cart from "../../models/ecommerce/cart.schema.js";
+import Order from "../../models/ecommerce/order.schema.js";
 
 export const getCoupan = async (req, res) => {
   try {
@@ -85,11 +87,15 @@ export const createCoupan = async (req, res) => {
     const { _id } = req.admin;
     const data = req.body;
     const slug = await slugGenerator(data.name, Coupan);
+    const items = data?.items?.map((item) => item.value);
+    const categories = data?.categories.map((cat) => cat.id);
 
     const payload = {
       ...data,
       slug,
       admin: _id,
+      items: items || null,
+      categories: categories || null,
     };
 
     const coupan = await Coupan.create(payload);
@@ -112,7 +118,11 @@ export const updateCoupan = async (req, res) => {
   try {
     const { _id } = req.admin;
     const { id } = req.params;
-    const payload = req.body;
+    let payload = req.body;
+    const items = payload?.items?.map((item) => item.value);
+    const categories = payload?.categories.map((cat) => cat.id);
+    payload.items = items || null;
+    payload.categories = categories || null;
     const query = {
       _id: id,
       admin: _id,
@@ -253,7 +263,6 @@ export const getCustomerCoupan = async (req, res) => {
     const { _id } = req.customer;
     const query = {
       customer: _id,
-
       deletedAt: null,
     };
 
@@ -278,10 +287,12 @@ export const getCustomerCoupan = async (req, res) => {
 
 export const claimCoupan = async (req, res) => {
   try {
-    const { id } = req.params;
+    const { couponCode, coupanId } = req.body;
     const { _id } = req.customer;
-    const response = await CoupanClaim.create({
-      coupanId: id,
+
+    await CoupanClaim.create({
+      coupanId: coupanId,
+      couponCode: couponCode,
       customer: _id,
     });
     return res.status(200).json({
@@ -293,6 +304,298 @@ export const claimCoupan = async (req, res) => {
       status: "error",
       message: "Internal server error",
       error: error.message,
+    });
+  }
+};
+
+// export const verifyCoupon = async (req, res) => {
+//   try {
+//     const { couponCode } = req.body;
+//     // const { _id } = req.customer;
+
+//     const coupon = await CoupanClaim.findOne({
+//       couponCode: couponCode,
+//       deletedAt: null,
+//     });
+
+//     if (!coupon) {
+//       return res.status(400).json({
+//         status: false,
+//         message: "Invalid coupon code",
+//       });
+//     }
+
+//     if (coupon?.one_time) {
+//       const orders = await Order.find({
+//         customer: new mongoose.Types.ObjectId("6945fa14ba3f1cfc95b588fa"),
+//         status: { $ne: "unpaid" },
+//       });
+
+//       if (orders.length > 0) {
+//         return res.status(400).json({
+//           message: "This coupon is only for first-time users",
+//         });
+//       }
+//     }
+
+//     const now = new Date();
+//     if (now < coupon.start_date || now > coupon.end_date) {
+//       return res.status(400).json({
+//         status: false,
+//         message: "Coupon expired or inactive",
+//       });
+//     }
+
+//     const cartAmount = await Cart.aggregate([
+//       {
+//         $match: {
+//           customer: new mongoose.Types.ObjectId("6945fa14ba3f1cfc95b588fa"),
+//           deletedAt: null,
+//         },
+//       },
+//       {
+//         $addFields: {
+//           itemTotal: { $multiply: ["$price", "$quantity"] },
+//         },
+//       },
+//       {
+//         $group: {
+//           _id: null,
+//           totalAmount: { $sum: "$itemTotal" },
+//         },
+//       },
+//     ]);
+
+//     const totalAmount = cartAmount[0]?.totalAmount || 0;
+
+//     if (totalAmount === 0) {
+//       return res.status(400).json({
+//         status: false,
+//         message: "Cart is empty",
+//       });
+//     }
+
+//     if (coupon.min_amount && totalAmount < coupon.min_amount) {
+//       return res.status(400).json({
+//         status: false,
+//         message: `Minimum cart value should be ₹${coupon.min_amount}`,
+//       });
+//     }
+
+//     let discountAmount = 0;
+
+//     if (coupon.discount_type === "percentage") {
+//       discountAmount = (totalAmount * coupon.max_amount) / 100;
+//     }
+
+//     if (coupon.discount_type === "fixed") {
+//       discountAmount = coupon.max_amount;
+//     }
+
+//     const finalAmount = Math.max(totalAmount - discountAmount, 0);
+
+//     return res.json({
+//       status: true,
+//       message: "Coupon applied successfully",
+//       data: {
+//         couponCode: coupon.code,
+//         discountType: coupon.discount_type,
+//         discountAmount,
+//         cartTotal: totalAmount,
+//         finalAmount,
+//       },
+//     });
+//   } catch (error) {
+//     return res.status(500).json({
+//       status: false,
+//       message: "Internal server error",
+//     });
+//   }
+// };
+
+export const verifyCoupon = async (req, res) => {
+  try {
+    const { couponCode } = req.body;
+    const customerId = new mongoose.Types.ObjectId(
+      "6945fa14ba3f1cfc95b588fa" // req.customer._id
+    );
+
+    /* ------------------------------------
+       1️⃣ Find coupon claim
+    ------------------------------------ */
+    const couponClaim = await CoupanClaim.findOne({
+      couponCode,
+      customer: new mongoose.Types.ObjectId(
+        "6945fa14ba3f1cfc95b588fa" // req.customer._id
+      ),
+      deletedAt: null,
+    });
+
+    if (!couponClaim) {
+      return res.status(400).json({
+        status: "error",
+        message: "Invalid coupon code",
+      });
+    }
+
+    const coupon = couponClaim.coupanId;
+
+    /* ------------------------------------
+       2️⃣ One-time coupon check
+    ------------------------------------ */
+    if (coupon.one_time) {
+      const orderCount = await Order.countDocuments({
+        customer: customerId,
+        status: { $ne: "unpaid" },
+      });
+
+      if (orderCount > 0) {
+        return res.status(400).json({
+          status: "error",
+          message: "This coupon is only for first-time users",
+        });
+      }
+    }
+
+    /* ------------------------------------
+       3️⃣ Date validation
+    ------------------------------------ */
+    const now = new Date();
+    if (now < coupon.start_date || now > coupon.end_date) {
+      return res.status(400).json({
+        status: "error",
+        message: "Coupon expired or inactive",
+      });
+    }
+
+    /* ------------------------------------
+       4️⃣ Fetch cart items
+    ------------------------------------ */
+    const cartItems = await Cart.aggregate([
+      {
+        $match: {
+          customer: customerId,
+          deletedAt: null,
+        },
+      },
+      {
+        $lookup: {
+          from: "items",
+          localField: "item",
+          foreignField: "_id",
+          as: "item",
+        },
+      },
+      { $unwind: "$item" },
+      {
+        $addFields: {
+          itemTotal: { $multiply: ["$price", "$quantity"] },
+        },
+      },
+    ]);
+
+    console.log("cartItems", cartItems);
+
+    if (!cartItems.length) {
+      return res.status(400).json({
+        status: "error",
+        message: "Cart is empty",
+      });
+    }
+
+    /* ------------------------------------
+       5️⃣ Cart total
+    ------------------------------------ */
+    const cartTotal = cartItems.reduce((sum, i) => sum + i.itemTotal, 0);
+
+    if (coupon.min_amount && cartTotal < coupon.min_amount) {
+      return res.status(400).json({
+        status: "error",
+        message: `Minimum cart value should be ₹${coupon.min_amount}`,
+      });
+    }
+
+    /* ------------------------------------
+       6️⃣ Calculate eligible amount
+    ------------------------------------ */
+    let eligibleAmount = 0;
+
+    // 🟢 CART LEVEL
+    if (coupon.type === "cart") {
+      eligibleAmount = cartTotal;
+    }
+
+    // 🟢 CATEGORY LEVEL
+    if (coupon.type === "category") {
+      cartItems.forEach((item) => {
+        if (
+          coupon.categories.some(
+            (cat) => cat._id.toString() === item.item.category.toString()
+          )
+        ) {
+          eligibleAmount += item.itemTotal;
+        }
+      });
+    }
+
+    // 🟢 PRODUCT / ITEM LEVEL
+    if (coupon.type === "product") {
+      cartItems.forEach((item) => {
+        if (
+          coupon.items.some(
+            (p) => p._id.toString() === item.item._id.toString()
+          )
+        ) {
+          eligibleAmount += item.itemTotal;
+        }
+      });
+    }
+
+    if (eligibleAmount === 0) {
+      return res.status(400).json({
+        status: "error",
+        message: "Coupon not applicable on selected items",
+      });
+    }
+
+    /* ------------------------------------
+       7️⃣ Discount calculation
+    ------------------------------------ */
+    let discountAmount = 0;
+
+    if (coupon.discount_type === "percentage") {
+      discountAmount = (eligibleAmount * coupon.max_amount) / 100;
+    }
+
+    if (coupon.discount_type === "fixed") {
+      discountAmount = coupon.max_amount;
+    }
+
+    discountAmount = Math.min(discountAmount, eligibleAmount);
+
+    /* ------------------------------------
+       8️⃣ Final amount
+    ------------------------------------ */
+    const finalAmount = cartTotal - discountAmount;
+
+    return res.json({
+      status: "success",
+      message: "Coupon applied successfully",
+      data: {
+        couponCode: coupon.code,
+        couponType: coupon.type,
+        discountType: coupon.discount_type,
+        cartTotal,
+        eligibleAmount,
+        discountAmount,
+        finalAmount,
+      },
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      status: "error",
+      message: "Internal server error",
     });
   }
 };

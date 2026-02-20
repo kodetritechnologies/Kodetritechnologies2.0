@@ -7,6 +7,10 @@ const CoupanClaimSchema = new mongoose.Schema(
       ref: "Coupan",
       required: true,
     },
+    couponCode: {
+      type: String,
+      required: true,
+    },
     customer: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Customer",

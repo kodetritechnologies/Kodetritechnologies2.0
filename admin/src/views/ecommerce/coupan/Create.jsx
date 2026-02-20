@@ -9,6 +9,8 @@ import toast from "react-hot-toast";
 import handleSubmitHelper from "../../../helpers/handleSubmitHelper";
 import { FaRectangleList } from "react-icons/fa6";
 import { IoCreate } from "react-icons/io5";
+import MultiSelectDropdown from "../../../components/MultiSelectDropdown";
+import JsTreeCheckbox from "../../../components/JsTreeCheckbox";
 
 function Create() {
   const { id } = useParams();
@@ -24,9 +26,16 @@ function Create() {
     max_amount: "",
     start_date: YYYYMMDD(new Date()),
     end_date: YYYYMMDD(new Date()),
-    type: "",
-    one_time: true,
+    type: "cart",
+    items: [],
+    categories: [],
+    one_time: false,
   });
+
+  const [categories, setCategories] = useState([]);
+  const [defaultCategories, setDefaultCategories] = useState([]);
+
+  console.log("initialValues", initialValues);
 
   const HeaderNavigation = [
     {
@@ -43,15 +52,46 @@ function Create() {
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-    setInitialValues((pre) => ({
-      ...pre,
-      [name]: type === "one_time" ? checked : value,
-    }));
+
+    setInitialValues((prev) => {
+      let updatedData = {
+        ...prev,
+        [name]: type === "checkbox" ? checked : value,
+      };
+      if (name === "type") {
+        if (value === "product") {
+          updatedData.categories = [];
+        }
+        if (value === "category") {
+          updatedData.items = [];
+        }
+      }
+      return updatedData;
+    });
   };
 
   const fetchData = async () => {
     const response = await basicProvider.getMethod(`ecommerce/coupan/by/${id}`);
-    setInitialValues(response.data);
+    const items = response?.data?.items?.map((item) => {
+      return {
+        label: item?.name,
+        value: item?._id,
+      };
+    });
+    setDefaultCategories(response?.data?.categories);
+
+    setInitialValues((pre) => ({
+      ...pre,
+      ...response.data,
+      items: items,
+    }));
+  };
+
+  const fetchCategory = async () => {
+    const response = await basicProvider.getMethod(
+      "configuration/categories/byType/product"
+    );
+    setCategories(response?.data || []);
   };
 
   const handleSubmit = async () => {
@@ -86,6 +126,10 @@ function Create() {
     if (id) {
       fetchData();
     }
+  }, []);
+
+  useEffect(() => {
+    fetchCategory();
   }, []);
 
   return (
@@ -167,8 +211,8 @@ function Create() {
                   <option value="" disabled selected>
                     Select Discount Type
                   </option>
-                  <option value="By Precentage">By Precentage</option>
-                  <option value="Fix Amount">Fix Amount</option>
+                  <option value="precentage">By Precentage</option>
+                  <option value="fixed">Fix Amount</option>
                 </select>
               </div>
               <div>
@@ -233,7 +277,7 @@ function Create() {
                   />
                 </div>
               </div>
-              <div className="flex">
+              <div className=" ">
                 <div className="w-full">
                   <label htmlFor="type" className="label">
                     Select Type <span className="text-red-700">*</span>
@@ -245,12 +289,50 @@ function Create() {
                     value={initialValues?.type}
                     onChange={handleChange}
                   >
-                    <option value="" selected disabled>
+                    <option value="cart" selected>
                       Select Type
                     </option>
-                    <option value="Category">Category</option>
-                    <option value="Product">Product</option>
+                    <option value="category">Category</option>
+                    <option value="product">Product</option>
                   </select>
+                </div>
+                <div className="cmt">
+                  {initialValues?.type === "product" && (
+                    <MultiSelectDropdown
+                      endPoint={"ecommerce/item"}
+                      value={initialValues?.items}
+                      setValue={(value) => {
+                        setInitialValues((pre) => ({
+                          ...pre,
+                          items: value,
+                          categories: [],
+                        }));
+                      }}
+                    />
+                  )}
+                  {initialValues?.type === "category" && (
+                    <>
+                      {categories?.length > 0 ? (
+                        <JsTreeCheckbox
+                          data={categories}
+                          defaultChecked={defaultCategories}
+                          onCheck={(checked) => {
+                            setInitialValues((pre) => ({
+                              ...pre,
+                              categories: checked,
+                              items: [],
+                            }));
+                          }}
+                        />
+                      ) : (
+                        <>
+                          <h3 className="text-center">
+                            Category not available
+                          </h3>
+                        </>
+                      )}
+                    </>
+                  )}
                 </div>
               </div>
               <div className="firstTimeUser flex gap-4 cmt">

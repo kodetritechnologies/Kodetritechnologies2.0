@@ -1,13 +1,15 @@
-import expres from "express";
+import express from "express";
 import "dotenv/config";
 import useragent from "express-useragent";
 import "./DATABASE.js";
-import "./Redis/redisClient.js";
-import "./Jobs/worker.js";
-const app = expres();
+// import "./Redis/redisClient.js";
+// import "./Jobs/worker.js";
+const app = express();
 const PORT = process.env.PORT || 5000;
 import bodyParser from "body-parser";
 import cookieParser from "cookie-parser";
+import path from "path";
+import { fileURLToPath } from "url";
 import cors from "cors";
 import dashBoardRouter from "./routers/dashboard/dashboard.router.js";
 import usersRouter from "./routers/authentications/users.router.js";
@@ -32,6 +34,12 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
 
+// setup ejs
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+app.set("view engine", "ejs");
+app.set("views", path.join(__dirname, "views"));
+
 const corsOptions = {
   origin: [process.env.FRONTEND_URL, process.env.ADMIN_URL],
   methods: "GET,POST,PATCH,DELETE",
@@ -40,7 +48,7 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
-app.use(expres.static("public"));
+app.use(express.static("public"));
 
 app.get("/api", (req, res) => {
   res.send(`${process.env.APP_NAME} api is running...`);

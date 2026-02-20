@@ -15,6 +15,7 @@ import {
   claimCoupan,
   getAllCoupan,
   getCustomerCoupan,
+  verifyCoupon,
 } from "../../controllers/ecommerce/coupan.controller.js";
 import {
   addToWishlist,
@@ -33,6 +34,7 @@ import {
   removeToCartCustomer,
   updateCartCustomer,
 } from "../../controllers/ecommerce/cart.controller.js";
+import { createPayment } from "../../controllers/ecommerce/order.controller.js";
 
 router.get("/reviews", customerAuthMiddleware, getCustomerReview);
 router.post("/reviews/create", customerAuthMiddleware, createCustomerReview);
@@ -52,7 +54,8 @@ router.get("/item/:id", getPublicItemBySlugOrId);
 
 router.get("/coupan/all", customerAuthMiddleware, getAllCoupan);
 router.get("/customer/coupan", customerAuthMiddleware, getCustomerCoupan);
-router.patch("/coupan/claim/:id", customerAuthMiddleware, claimCoupan);
+router.post("/coupan/claim", customerAuthMiddleware, claimCoupan);
+router.post("/verify-coupon", verifyCoupon);
 
 // Wishlist
 
@@ -85,5 +88,9 @@ router.get("/cart", customerAuthMiddleware, getCustomerCart);
 router.post("/cart/create", customerAuthMiddleware, addTocartCustomer);
 router.patch("/cart/update/:id", customerAuthMiddleware, updateCartCustomer);
 router.delete("/cart/delete/:id", customerAuthMiddleware, removeToCartCustomer);
+
+// Order
+
+router.get("/order/payment", createPayment);
 
 export default router;
