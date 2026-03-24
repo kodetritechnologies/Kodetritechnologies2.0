@@ -30,6 +30,7 @@ function Login() {
   });
 
   const [error, setError] = useState({});
+  const [loading, setLoading] = useState(false);
   const handleChange = (e) => {
     const { name, value, checked } = e.target;
     setInitialValues((pre) => ({
@@ -48,8 +49,9 @@ function Login() {
       if (data) {
         const response = await basicProvider.postMethod(
           "users/admin/login",
-          data
+          data,
         );
+        setLoading(true);
         if (response.status === "success") {
           toast.success(response.message);
           setAdmin(response?.data);
@@ -65,6 +67,8 @@ function Login() {
       }
     } catch (error) {
       console.log(error);
+    } finally {
+      setLoading(false);
     }
   };
   return (
@@ -74,7 +78,7 @@ function Login() {
       </div>
       <div className="loginRight">
         <div className="registerlogo">
-          <img src="/suposto.png" alt="logo" />
+          <img src="/sublogo.png" alt="logo" />
         </div>
         <div className="signupForm">
           <h1 className="text-center font-bold">Login to Dashboard</h1>
@@ -100,8 +104,9 @@ function Login() {
               Password
             </label>
             <div
-              className={`input-password ${error.password && "customeErrorInput"
-                }`}
+              className={`input-password ${
+                error.password && "customeErrorInput"
+              }`}
             >
               <input
                 type={show ? "text" : "password"}
@@ -145,7 +150,7 @@ function Login() {
             </label>
           </div>
           <div className="signup" onClick={handleSubmit}>
-            Login
+            {loading ? "Logging in..." : "Login"}
           </div>
           <div className="flex justify-center items-center gap-2">
             <span className="or"></span>
@@ -162,9 +167,6 @@ function Login() {
             <span className="text-[#518EF8]">
               <NavLink to="/signup">Sign up</NavLink>
             </span>
-          </div>
-          <div className="googleButton">
-            <img src={googlecon} alt="" /> <span>Login with Google</span>
           </div>
         </div>
       </div>
