@@ -52,10 +52,9 @@ import Signup from "./pages/Signup";
 import Login from "./pages/Login";
 import ProtectedRoutes from "./authentications/ProtectedRoutes";
 import ProtectedPageRoutes from "./authentications/ProtectedPageRoutes";
-import SupportTicket from "./views/support/supportTicket/CustomerSupport";
+import SupportTicket from "./views/support/supportTicket/All";
 import SupportTicketDetails from "./views/support/supportTicket/SupportTicketDetails";
-import GenerateSupportTicket from "./views/support/supportTicket/GenerateSupport";
-import MySupportTicket from "./views/support/supportTicket/MySupportTicket";
+import GenerateSupportTicket from "./views/support/supportTicket/Create";
 import Reviews from "./views/ecommerce/Reviews";
 import Profile from "./pages/Profile";
 import { createBrowserRouter } from "react-router-dom";
@@ -173,8 +172,6 @@ const router = createBrowserRouter([
         element: <SupportTicketDetails />,
       },
       { path: "/support/create", element: <GenerateSupportTicket /> },
-      { path: "/support/my-support-ticket", element: <MySupportTicket /> },
-
       { path: "/customer/all", element: <Customer /> },
       { path: "/customer/create", element: <CustomerCreate /> },
       {

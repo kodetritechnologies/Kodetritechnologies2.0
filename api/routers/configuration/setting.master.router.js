@@ -77,11 +77,11 @@ router.post("/smtp/create", adminAuthMiddleware, createSmtp);
 // Master Routes
 
 // Categories
-router.post("/categories/create", adminAuthMiddleware, createCategories);
+router.post("/categories/create", uploadMiddleware, adminAuthMiddleware, createCategories);
 router.get("/categories/types", adminAuthMiddleware, categoriesTypes);
 router.get("/categories/byId/:id", adminAuthMiddleware, getCategoryById);
 router.get("/categories/byType/:type", adminAuthMiddleware, getCategoryByType);
-router.patch("/categories/update/:id", adminAuthMiddleware, updateCategory);
+router.patch("/categories/update/:id", uploadMiddleware, adminAuthMiddleware, updateCategory);
 router.delete("/categories/delete/:id", adminAuthMiddleware, deleteCategory);
 
 // Regions

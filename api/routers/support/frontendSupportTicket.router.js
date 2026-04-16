@@ -4,15 +4,39 @@ import { customerAuthMiddleware } from "../../middlewares/customerAuthMiddleware
 import {
   createSupportTicketCustomer,
   deleteSupportTicketCustomer,
+  getAllSupportTicketCustomer,
+  getSupportTicketByIdCustomer,
+  multiDeleteSupportTicketCustomer,
   replySupportTicketCustomer,
 } from "../../controllers/support/support-ticket.controller.js";
 
-router.post("/create", customerAuthMiddleware, createSupportTicketCustomer);
-router.patch("/reply/:id", customerAuthMiddleware, replySupportTicketCustomer);
+import { uploadMiddleware } from "../../helpers/fileUploads.js";
+
+router.get("/", customerAuthMiddleware, getAllSupportTicketCustomer);
+router.get("/:id", customerAuthMiddleware, getSupportTicketByIdCustomer);
+
+router.post(
+  "/create",
+  uploadMiddleware,
+  customerAuthMiddleware,
+  createSupportTicketCustomer,
+);
+router.patch(
+  "/reply/:id",
+  uploadMiddleware,
+  customerAuthMiddleware,
+  replySupportTicketCustomer,
+);
 router.delete(
   "/delete/:id",
   customerAuthMiddleware,
-  deleteSupportTicketCustomer
+  deleteSupportTicketCustomer,
 );
+router.post(
+  "/multi-delete",
+  customerAuthMiddleware,
+  multiDeleteSupportTicketCustomer,
+);
+
 
 export default router;

@@ -12,13 +12,7 @@ import File from "../../models/file.schema.js";
 
 export const customerSignup = async (req, res) => {
   try {
-    const { name, email, password, domain } = req.body;
-
-    if (!name) {
-      return res
-        .status(400)
-        .json({ status: "error", message: "Name is required" });
-    }
+    const { name, email, password } = req.body;
     if (!email) {
       return res
         .status(400)
@@ -53,8 +47,7 @@ export const customerSignup = async (req, res) => {
 
 export const customerLogin = async (req, res) => {
   try {
-    const { email, password } = req.body;
-
+    const { email, password, remember_me } = req.body;
     const isExistCustomer = await Customer.findOne({ email });
 
     if (!isExistCustomer) {
@@ -94,12 +87,21 @@ export const customerLogin = async (req, res) => {
 
     const token = generateToken(payload);
 
-    res.cookie("customerAccessToken", token, {
-      httpOnly: true,
-      secure: true,
-      sameSite: "None",
-      maxAge: 1000 * 60 * 60 * 24 * 7,
-    });
+    if (remember_me || remember_me == undefined) {
+      res.cookie("customerAccessToken", token, {
+        httpOnly: true,
+        secure: true,
+        sameSite: "None",
+        maxAge: 1000 * 60 * 60 * 24 * 7,
+      });
+    } else {
+      res.cookie("customerAccessToken", token, {
+        httpOnly: true,
+        secure: true,
+        sameSite: "None",
+      });
+    }
+
     await adminsLogsHelper(req, "Customer logged in successfully");
     return res.status(200).json({
       status: "success",
@@ -119,9 +121,27 @@ export const CustomerUpdate = async (req, res) => {
   try {
     const data = req.body;
     const { _id } = req.customer;
+
+    let isExistCustomer = await Customer.findOne({ _id: _id });
+
+    if (data?.featured_image && typeof data.featured_image === "object") {
+      data.featured_image = data.featured_image._id;
+    } else if (data?.featured_image) {
+      data.featured_image = data.featured_image;
+    } else if (
+      req?.files?.featured_image &&
+      req.files.featured_image.length > 0
+    ) {
+      const image = await fileUploads(req);
+      data.featured_image = image?.featured_image?._id;
+    } else {
+      await File.deleteOne({ _id: isExistCustomer?.featured_image });
+      data.featured_image = null;
+    }
+
     const response = await Customer.findByIdAndUpdate(
       { _id: _id },
-      { ...data }
+      { ...data },
     );
     if (!response) {
       return res
@@ -136,9 +156,62 @@ export const CustomerUpdate = async (req, res) => {
   }
 };
 
+export const getCustomerProfile = async (req, res) => {
+  try {
+    const { _id } = req.customer;
+
+    const result = await Customer.findById(_id).select(" -password");
+    if (!result) {
+      return res.status(404).json({
+        status: "error",
+        message: "User not found",
+      });
+    }
+
+    return res.status(200).json({
+      status: "success",
+      message: "User profile get successfully",
+      data: result,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      status: "error",
+      message: "Something went wrong on the server",
+      error: error.message,
+    });
+  }
+};
+
+export const customerLogOut = async (req, res) => {
+  try {
+    const customerAccessToken = req.cookies?.customerAccessToken;
+
+    if (!customerAccessToken) {
+      return res
+        .status(401)
+        .json({ status: "error", message: "No active session found" });
+    }
+
+    res.clearCookie("customerAccessToken", {
+      httpOnly: true,
+      secure: true,
+      sameSite: "None",
+    });
+
+    return res
+      .status(200)
+      .json({ status: "success", message: "Customer logged out successfully" });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ status: "error", message: "Internal server error" });
+  }
+};
+
+
 export const adminCustomerCreate = async (req, res) => {
   try {
-    const { name, email, password } = req.body;
+    const { name, email, password, featured_image } = req.body;
     const { _id } = req.admin;
 
     if (!name) {
@@ -164,7 +237,9 @@ export const adminCustomerCreate = async (req, res) => {
         .json({ status: "error", message: "Email is already registered" });
     }
 
-    if (req.files.featured_image[0]) {
+    if (featured_image == null) {
+      delete req.body.featured_image;
+    } else if (req.files.featured_image[0]) {
       const image = await fileUploads(req);
       req.body.featured_image = image?.featured_image?._id;
     } else {
@@ -192,9 +267,7 @@ export const adminCustomerCreate = async (req, res) => {
 
 export const getAdminCustomers = async (req, res) => {
   try {
-    const { _id } = req.admin;
     const query = GenerateSearchQuery(req, {
-      $or: [{ admin: _id }],
       deletedAt: null,
     });
     const options = generateOptions(req);
@@ -216,11 +289,8 @@ export const getAdminCustomers = async (req, res) => {
 
 export const getAdminCustomersTrash = async (req, res) => {
   try {
-    const { _id } = req.admin;
     const query = GenerateSearchQuery(req, {
-      $or: [{ admin: _id }],
       deletedAt: { $ne: null },
-      pendingDelete: false,
     });
     const options = generateOptions(req);
     const response = await Customer.paginate(query, options);
@@ -383,7 +453,7 @@ export const adminCustomerTrash = async (req, res) => {
       { deletedAt: new Date() },
       {
         new: true,
-      }
+      },
     );
 
     return res.status(200).json({

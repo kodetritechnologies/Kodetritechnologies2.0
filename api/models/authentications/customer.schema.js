@@ -5,7 +5,6 @@ const customerScheam = new mongoose.Schema(
   {
     name: {
       type: String,
-      required: true,
     },
     mobile: {
       type: String,
@@ -40,10 +39,6 @@ const customerScheam = new mongoose.Schema(
       enum: ["active", "inactive", "blocked"],
       default: "active",
     },
-    admin: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Admin",
-    },
     deletedAt: {
       type: Date,
       default: null,
@@ -54,7 +49,7 @@ const customerScheam = new mongoose.Schema(
       default: false,
     },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 customerScheam.pre("save", async function (next) {

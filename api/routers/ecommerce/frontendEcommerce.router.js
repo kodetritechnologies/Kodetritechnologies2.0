@@ -42,7 +42,7 @@ router.patch("/reviews/update", customerAuthMiddleware, customerReviewUpdate);
 router.delete(
   "/reviews/delete/:id",
   customerAuthMiddleware,
-  customerReviewDelete
+  customerReviewDelete,
 );
 
 // Item
@@ -64,23 +64,15 @@ router.post("/wishlist/create", customerAuthMiddleware, addToWishlist);
 router.delete(
   "/wishlist/remove/:id",
   customerAuthMiddleware,
-  removeFromWishlist
+  removeFromWishlist,
 );
 
 // Address
 
-router.get("/address/all", customerAuthMiddleware, getAllCustomerAddress);
-router.post("/address/create", customerAuthMiddleware, createCustomerAddress);
-router.patch(
-  "/address/update/:id",
-  customerAuthMiddleware,
-  updateCustomerAddress
-);
-router.delete(
-  "/address/delete/:id",
-  customerAuthMiddleware,
-  deleteCustomerAddress
-);
+router.get("/address", customerAuthMiddleware, getAllCustomerAddress);
+router.post("/address", customerAuthMiddleware, createCustomerAddress);
+router.patch("/address/:id", customerAuthMiddleware, updateCustomerAddress);
+router.delete("/address/:id", customerAuthMiddleware, deleteCustomerAddress);
 
 // Cart
 

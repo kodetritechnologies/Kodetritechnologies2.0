@@ -47,7 +47,6 @@ function Create() {
     featured_image: null,
   });
 
-  console.log("initialValues", initialValues);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -89,7 +88,7 @@ function Create() {
           toast.success(response.message);
           fetchData();
           if (response?.data) {
-            navigate(`/customer/${response?.data?._id}/edit`);
+            navigate(`/customer/${response?.data?._id}/profile`);
           }
         } else {
           toast.error(response.message);

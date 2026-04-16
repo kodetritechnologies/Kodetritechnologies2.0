@@ -2,17 +2,29 @@ import mongoose from "mongoose";
 import Categories from "../../../models/configuration/master/categories.schema.js";
 import { slugGenerator } from "../../../helpers/slugGenerator.js";
 import { adminsLogsHelper } from "../../../helpers/adminsLogsHelper.js";
+import { fileUploads } from "../../../helpers/fileUploads.js";
 
 export const createCategories = async (req, res) => {
   try {
-    const { _id,  } = req.admin;
-    const { name, type, parent } = req.body;
+    let { name, type, parent } = req.body;
+    let data = req?.body
 
     if (!Array.isArray(name) || name.length === 0) {
-      return res.status(400).json({
-        status: "error",
-        message: "Name must be a non-empty array",
-      });
+      name = name?.split(",")
+    }
+
+    if (data?.featured_image && typeof data.featured_image === "object") {
+      data.featured_image = data.featured_image._id;
+    } else if (data?.featured_image) {
+      data.featured_image = data.featured_image;
+    } else if (
+      req?.files?.featured_image &&
+      req.files.featured_image.length > 0
+    ) {
+      const image = await fileUploads(req);
+      data.featured_image = image?.featured_image?._id;
+    } else {
+      data.featured_image = null;
     }
 
     const createdCategories = [];
@@ -24,8 +36,7 @@ export const createCategories = async (req, res) => {
         name: singleName,
         slug,
         type,
-        admin: _id,
-        
+        featured_image: data.featured_image,
         parent: parent || null,
       };
 
@@ -54,10 +65,8 @@ export const createCategories = async (req, res) => {
 
 export const categoriesTypes = async (req, res) => {
   try {
-    const { _id,  } = req.admin;
 
     const query = {
-      admin: new mongoose.Types.ObjectId(_id),
       deletedAt: null,
       parent: null,
     };
@@ -110,10 +119,8 @@ export const categoriesTypes = async (req, res) => {
 
 export const getCategoryByType = async (req, res) => {
   try {
-    const { _id,  } = req.admin;
     const { type } = req.params;
     const query = {
-      admin: _id,
       type: type,
       deletedAt: null,
       parent: null,
@@ -136,12 +143,10 @@ export const getCategoryByType = async (req, res) => {
 
 export const getCategoryById = async (req, res) => {
   try {
-    const { _id,  } = req.admin;
     const { id } = req.params;
 
     const category = await Categories.findOne({
       _id: new mongoose.Types.ObjectId(id),
-      admin: new mongoose.Types.ObjectId(_id),
       deletedAt: null,
     }).populate("parent", "name _id");
 
@@ -168,13 +173,26 @@ export const getCategoryById = async (req, res) => {
 
 export const updateCategory = async (req, res) => {
   try {
-    const { _id,  } = req.admin;
     const { id } = req.params;
-    const { name, type, parent } = req.body;
+    let { name, type, parent, featured_image } = req.body;
+
+    if (featured_image && typeof featured_image === "object") {
+      featured_image = featured_image._id;
+    } else if (featured_image) {
+      featured_image = featured_image;
+    } else if (
+      req?.files?.featured_image &&
+      req.files.featured_image.length > 0
+    ) {
+      const image = await fileUploads(req);
+      featured_image = image?.featured_image?._id;
+    } else {
+      featured_image = null;
+    }
+
 
     const category = await Categories.findOne({
       _id: id,
-      admin: new mongoose.Types.ObjectId(_id),
       deletedAt: null,
     });
 
@@ -199,6 +217,7 @@ export const updateCategory = async (req, res) => {
 
     if (type) category.type = type;
     category.parent = parent || null;
+    category.featured_image = featured_image || null;
 
     await category.save();
     await adminsLogsHelper(req, "Category updated successfully");
@@ -218,12 +237,10 @@ export const updateCategory = async (req, res) => {
 
 export const deleteCategory = async (req, res) => {
   try {
-    const { _id,  } = req.admin;
     const { id } = req.params;
 
     const category = await Categories.findOne({
       _id: id,
-      admin: new mongoose.Types.ObjectId(_id),
     });
 
     if (!category) {

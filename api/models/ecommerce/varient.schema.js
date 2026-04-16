@@ -11,6 +11,9 @@ const varientSchema = new mongoose.Schema(
     name: {
       type: String,
     },
+    slug: {
+      type: String,
+    },
     value: {
       type: String,
     },
@@ -52,7 +55,7 @@ const varientSchema = new mongoose.Schema(
       ref: "Item",
     },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 varientSchema.pre("find", function (next) {

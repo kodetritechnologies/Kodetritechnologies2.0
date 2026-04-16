@@ -14,11 +14,13 @@ function Categories() {
   const basicProvider = BasicProvider();
 
   const [categories, setCategories] = useState([]);
+  const [image, setImage] = useState(null);
   const [type, setType] = useState(false);
   const [initialValues, setInitialValues] = useState({
     name: [],
     type: "",
     parent: "",
+    featured_image:null
   });
 
   const fetchData = async () => {
@@ -39,7 +41,9 @@ function Categories() {
         name: [data.name],
         type: data.type,
         parent: data.parent?._id || "",
+        featured_image: data.featured_image,
       });
+      setImage(data.featured_image);
     } else {
       toast.error(response.message);
     }
@@ -179,7 +183,16 @@ function Categories() {
 
               <TableLayoutComp title={"Image Detail"} showSwitch={true}>
                 <div className="imageDetailcard cp">
-                  {/* <FileUplodsModule /> */}
+                  <FileUplodsModule
+                  initialValues={image}
+                  setInitialValues={(files) => {
+                    setInitialValues((pre) => ({
+                      ...pre,
+                      featured_image: files[0]?.file || files[0],
+                    }));
+                  }}
+                  type="featured_image"
+                />
                 </div>
               </TableLayoutComp>
 

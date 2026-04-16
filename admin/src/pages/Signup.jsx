@@ -1,5 +1,5 @@
 import { IoMdEye, IoMdEyeOff } from "react-icons/io";
-import googlecon from "../assets/icons/google.png";
+import googlecon from "..//assets/icons/google.png";
 import { useContext, useEffect, useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import BasicProvider from "../authentications/BasicProvider";

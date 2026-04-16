@@ -34,20 +34,24 @@ function Details() {
           <hr className="horizontalRuler" />
           <div className="contactDetails">
             {data?.values &&
-              Object?.entries(data?.values)?.map(([key, value]) => (
-                <div className="flex gap-2 items-center" key={key}>
-                  <label htmlFor="" className="label font-bold">
-                    {key} :
-                  </label>
-                  <span>{value}</span>
-                </div>
-              ))}
+              Object?.entries(data?.values)
+                ?.filter(([key]) => key !== "message")
+                ?.map(([key, value]) => (
+                  <div className="flex gap-2 items-center" key={key}>
+                    <label htmlFor="" className="label font-bold">
+                      {key} :
+                    </label>
+                    <span>{value}</span>
+                  </div>
+                ))}
             {data?.values?.message && (
               <div>
                 <label htmlFor="" className="label">
                   Message
                 </label>
-                <textarea name="" className="input" readOnly id=""></textarea>
+                <textarea name="" className="input" readOnly id="">
+                  {data?.values?.message}
+                </textarea>
               </div>
             )}
           </div>

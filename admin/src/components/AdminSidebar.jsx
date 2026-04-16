@@ -10,7 +10,6 @@ import {
   IoMdNotifications,
 } from "react-icons/io";
 import {
-  IoChatbubbleEllipsesOutline,
   IoDocumentTextSharp,
   IoListOutline,
   IoSettings,
@@ -207,8 +206,8 @@ function AdminSidebar() {
                   show && type == "cms"
                     ? "inline-block"
                     : cms
-                    ? "inline-block"
-                    : "none",
+                      ? "inline-block"
+                      : "none",
               }}
             >
               <li
@@ -621,23 +620,7 @@ function AdminSidebar() {
               <NavLink to="support/support-ticket" className="customeRoute">
                 <span>
                   <MdSupportAgent />
-                  Customer Support
-                </span>
-              </NavLink>
-            </li>
-            <li>
-              <NavLink to="support/my-support-ticket" className="customeRoute">
-                <span>
-                  <IoListOutline />
-                  My Support Tickets
-                </span>
-              </NavLink>
-            </li>
-            <li>
-              <NavLink to="support/create" className="customeRoute">
-                <span>
-                  <IoChatbubbleEllipsesOutline />
-                  Generate Support
+                  Support Ticket
                 </span>
               </NavLink>
             </li>

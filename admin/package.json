@@ -21,6 +21,7 @@
     "chart.js": "^4.5.0",
     "ckeditor5": "^46.0.1",
     "ckeditor5-premium-features": "^46.0.1",
+    "highlight.js": "^11.11.1",
     "jodit-react": "^5.2.19",
     "jquery": "^3.7.1",
     "jstree": "^3.3.17",

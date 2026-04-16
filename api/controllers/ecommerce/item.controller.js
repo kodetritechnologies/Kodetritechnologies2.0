@@ -124,12 +124,16 @@ export const createItem = async (req, res) => {
     });
 
     if (data.type === "variants" && Array.isArray(variantsData)) {
-      const variantsWithItemId = variantsData.map((v) => ({
-        ...v,
-        itemId: item._id,
-        admin: _id,
-      }));
-
+      const variantsWithItemId = await Promise.all(
+        variantsData.map(async (v) => {
+          const variantSlug = await slugGenerator(v.name, Varient);
+          return {
+            ...v,
+            slug: variantSlug,
+            itemId: item._id,
+          };
+        }),
+      );
       const variants = await Varient.create(variantsWithItemId);
 
       const variantIds = variants.map((v) => v._id);
@@ -197,12 +201,15 @@ export const updateItem = async (req, res) => {
       if (data?.varients.length > 0) {
         const result = await Promise.all(
           data.varients.map(async (varient) => {
+            if (!varient.slug) {
+              varient.slug = await slugGenerator(varient.name, Varient);
+            }
             return await Varient.findOneAndUpdate(
               { _id: new mongoose.Types.ObjectId(varient?._id) },
               { ...varient },
-              { upsert: true, new: true }
+              { upsert: true, new: true },
             ).select("_id");
-          })
+          }),
         );
         data.varients = result;
       } else {
@@ -211,11 +218,12 @@ export const updateItem = async (req, res) => {
 
       const itemVarients = await Item.findOne(query);
       const existingVarients = itemVarients?.varients?.map(
-        (varient) => varient?._id
+        (varient) => varient?._id,
       );
       const currentVarients = data?.varients?.map((varient) => varient?._id);
       const deletedVarients = existingVarients?.filter(
-        (id) => !currentVarients.some((cid) => cid.toString() === id.toString())
+        (id) =>
+          !currentVarients.some((cid) => cid.toString() === id.toString()),
       );
 
       if (deletedVarients) {
@@ -296,7 +304,7 @@ export const trashItem = async (req, res) => {
       { deletedAt: new Date() },
       {
         new: true,
-      }
+      },
     );
     await adminsLogsHelper(req, "Item trash successfully");
     return res.status(200).json({
@@ -480,9 +488,22 @@ export const itemsCounts = async (req, res) => {
 
 export const getPublicItems = async (req, res) => {
   try {
+    const { tranding, hot, featured } = req?.query;
     const query = {
       deletedAt: null,
     };
+
+    if (tranding == "true" || tranding == true) {
+      query.tranding = true;
+    }
+
+    if (featured == "true" || featured == true) {
+      query.featured = true;
+    }
+
+    if (hot == "true" || hot == true) {
+      query.hot = true;
+    }
 
     const options = generateOptions(req);
     const response = await Item.paginate(query, {

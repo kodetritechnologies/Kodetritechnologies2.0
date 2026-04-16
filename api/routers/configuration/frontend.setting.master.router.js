@@ -1,7 +1,13 @@
 import express from "express";
 const router = express.Router();
 import { getBrandsFrontend } from "../../controllers/configuration/master/brands.controller.js";
+import { getFooterSettingByType } from "../../controllers/configuration/setting/footer.controller.js";
+import { getRegionsPublicByType } from "../../controllers/configuration/master/regions.controller.js";
+import { getCategoryByType } from "../../controllers/configuration/master/categories.controller.js";
 
 router.get("/brands/all", getBrandsFrontend);
+router.get("/footerSetting/:type", getFooterSettingByType);
+router.get("/regions/:type", getRegionsPublicByType);
+router.get("/categories/:type", getCategoryByType);
 
 export default router;

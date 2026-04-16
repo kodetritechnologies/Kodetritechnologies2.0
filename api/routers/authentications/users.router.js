@@ -22,6 +22,8 @@ import {
   getAdminCustomerById,
   getAdminCustomers,
   getAdminCustomersTrash,
+  getCustomerProfile,
+  customerLogOut,
 } from "../../controllers/authentications/customer.controller.js";
 import {
   ownerCreate,
@@ -45,7 +47,7 @@ router.patch(
   "/admin/update/:id",
   uploadMiddleware,
   adminAuthMiddleware,
-  adminUpdate
+  adminUpdate,
 );
 router.get("/admin/logout", adminAuthMiddleware, adminLogOut);
 
@@ -59,62 +61,72 @@ router.patch(
   "/owner/update/:id",
   uploadMiddleware,
   ownerAuthMiddleware,
-  ownerUpdate
+  ownerUpdate,
 );
 router.get("/owner/logout", ownerAuthMiddleware, ownerLogOut);
 
 // Customer Routes
 
+// public routes
 router.post("/customer/signup", customerSignup);
 router.post("/customer/login", customerLogin);
-router.post("/customer/update", customerAuthMiddleware, CustomerUpdate);
+router.post(
+  "/customer/update",
+  uploadMiddleware,
+  customerAuthMiddleware,
+  CustomerUpdate,
+);
+router.get("/customer/profile", customerAuthMiddleware, getCustomerProfile);
+router.get("/customer/logout", customerAuthMiddleware, customerLogOut);
+
+// admin routes
 router.post(
   "/admin/customer/create",
   uploadMiddleware,
   adminAuthMiddleware,
-  adminCustomerCreate
+  adminCustomerCreate,
 );
 router.get("/admin/customers/all", adminAuthMiddleware, getAdminCustomers);
 router.get(
   "/admin/customers/trash/all",
   adminAuthMiddleware,
-  getAdminCustomersTrash
+  getAdminCustomersTrash,
 );
 router.get(
   "/admin/customer/byId/:id",
   adminAuthMiddleware,
-  getAdminCustomerById
+  getAdminCustomerById,
 );
 router.patch(
   "/admin/customer/update/:id",
   uploadMiddleware,
   adminAuthMiddleware,
-  adminCustomerUpdate
+  adminCustomerUpdate,
 );
 router.delete(
   "/admin/customer/delete/:id",
   adminAuthMiddleware,
-  adminCustomerDelete
+  adminCustomerDelete,
 );
 router.delete(
   "/admin/customer/trash/:id",
   adminAuthMiddleware,
-  adminCustomerTrash
+  adminCustomerTrash,
 );
 router.post(
   "/admin/customer/multi-delete",
   adminAuthMiddleware,
-  adminCustomerMultiDelete
+  adminCustomerMultiDelete,
 );
 router.post(
   "/admin/customer/multi-trash",
   adminAuthMiddleware,
-  adminCustomerMultiTrash
+  adminCustomerMultiTrash,
 );
 router.delete(
   "/admin/customer/restore/:id",
   adminAuthMiddleware,
-  adminCustomerRestoreTrash
+  adminCustomerRestoreTrash,
 );
 
 export default router;

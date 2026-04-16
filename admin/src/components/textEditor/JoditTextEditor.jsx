@@ -7,9 +7,7 @@ export default function JoditTextEditor({ initialValues, setInitialValues }) {
     <JoditEditor
       ref={editor}
       value={initialValues}
-      onBlur={(newContent) =>
-        setInitialValues(newContent)
-      }
+      onBlur={(newContent) => setInitialValues(newContent)}
     />
   );
 }

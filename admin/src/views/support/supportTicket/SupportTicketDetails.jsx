@@ -53,7 +53,7 @@ function SupportTicketDetails() {
   const handleRemoveGallery = (file, index) => {
     setinitialValues((prev) => {
       const updatedGallery = (prev.gallery || []).filter(
-        (_, idx) => idx !== index
+        (_, idx) => idx !== index,
       );
       setTimeout(() => {
         if (file.url?.startsWith("blob:")) URL.revokeObjectURL(file.url);
@@ -64,7 +64,7 @@ function SupportTicketDetails() {
 
   const fetchData = async () => {
     const response = await basicProvider.getMethod(
-      `support/support-ticket/by/${id}`
+      `support/support-ticket/by/${id}`,
     );
     setData(response.data);
     setinitialValues((pre) => ({ ...pre, status: response?.data?.status }));
@@ -78,7 +78,7 @@ function SupportTicketDetails() {
     if (data) {
       const response = await basicProvider.patchMethod(
         `support/support-ticket/reply/${id}`,
-        data
+        data,
       );
       if (response.status === "success") {
         setinitialValues({
@@ -101,7 +101,7 @@ function SupportTicketDetails() {
       <div className="supportHeader">
         <div>
           <div>
-            <span className="font-bold">Ticket</span> / #{data?.ticket_no}
+            <span className="font-bold">Ticket : </span> #{data?.ticket_no}
           </div>
           <div>
             <span className="font-bold">Subject : </span>
@@ -124,46 +124,44 @@ function SupportTicketDetails() {
           <div className="containet">
             {data?.message?.map((msg) => (
               <>
-                {msg?.from === "customer" ||
-                  ("owner" && (
-                    <div style={{ padding: "0.5rem" }}>
-                      <div className="customerReplay">
-                        <div
-                          className="bg-[#EBEDEF]"
-                          style={{ padding: "0.5rem", borderRadius: "8px" }}
-                        >
-                          {msg?.message}
-                        </div>
-                        <div
-                          className="flex items-center gap-2 cpl"
-                          style={{ marginTop: "4px" }}
-                        >
-                          {msg?.from === "customer" ||
-                            ("owner" && (
-                              <span>{getDateTime(msg?.createdAt)}</span>
-                            ))}
-                        </div>
-                        {msg?.gallery?.length > 0 && (
-                          <div className="flex flex-wrap gap-4">
-                            {msg?.gallery?.map((img) => (
-                              <img
-                                style={{
-                                  borderRadius: "8px",
-                                  border: "0.5px solid gray",
-                                  objectFit: "contain",
-                                  width: "60px",
-                                  height: "60px",
-                                }}
-                                className=""
-                                src={img.url}
-                                alt="not found"
-                              />
-                            ))}
-                          </div>
+                {msg?.from === "customer" && (
+                  <div style={{ padding: "0.5rem" }}>
+                    <div className="customerReplay">
+                      <div
+                        className="bg-[#EBEDEF]"
+                        style={{ padding: "0.5rem", borderRadius: "8px" }}
+                      >
+                        {msg?.message}
+                      </div>
+                      <div
+                        className="flex items-center gap-2 cpl"
+                        style={{ marginTop: "4px" }}
+                      >
+                        {msg?.from === "customer" && (
+                          <span>{getDateTime(msg?.createdAt)}</span>
                         )}
                       </div>
+                      {msg?.gallery?.length > 0 && (
+                        <div className="flex flex-wrap gap-4">
+                          {msg?.gallery?.map((img) => (
+                            <img
+                              style={{
+                                borderRadius: "8px",
+                                border: "0.5px solid gray",
+                                objectFit: "contain",
+                                width: "60px",
+                                height: "60px",
+                              }}
+                              className=""
+                              src={img.url}
+                              alt="not found"
+                            />
+                          ))}
+                        </div>
+                      )}
                     </div>
-                  ))}
+                  </div>
+                )}
                 {msg?.from === "admin" && (
                   <div
                     className="w-full flex justify-end items-end float-end"

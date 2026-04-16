@@ -144,6 +144,11 @@ export const createCustomerAddress = async (req, res) => {
 
       customer: _id,
     };
+
+    if (body.isDefault) {
+      await Address.updateMany({ customer: _id }, { $set: { isDefault: false } });
+    }
+
     await Address.create(payload);
     res.status(201).json({
       status: "success",
@@ -169,6 +174,14 @@ export const updateCustomerAddress = async (req, res) => {
 
       customer: _id,
     };
+
+    if (body.isDefault) {
+      await Address.updateMany(
+        { customer: _id, _id: { $ne: id } },
+        { $set: { isDefault: false } }
+      );
+    }
+
     await Address.findOneAndUpdate(query, { $set: { ...body } }, { new: true });
     res.status(201).json({
       status: "success",

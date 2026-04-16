@@ -16,9 +16,14 @@ const addressSchema = new mongoose.Schema(
       type: String,
     },
     city: {
-      type: String,
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Regions",
     },
     state: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Regions",
+    },
+    country: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Regions",
     },
@@ -27,6 +32,16 @@ const addressSchema = new mongoose.Schema(
     },
     alt_mobile: {
       type: Number,
+    },
+    email: {
+      type: String,
+    },
+    zip: {
+      type: String,
+    },
+    isDefault: {
+      type: Boolean,
+      default: false,
     },
     type: {
       type: String,
@@ -47,15 +62,17 @@ const addressSchema = new mongoose.Schema(
 
 addressSchema.pre("find", function (next) {
   this.populate("customer");
-  this.populate("");
   this.populate("state");
+  this.populate("city");
+  this.populate("country");
   next();
 });
 
 addressSchema.pre("findOne", function (next) {
   this.populate("customer");
-  this.populate("");
   this.populate("state");
+  this.populate("city");
+  this.populate("country");
   next();
 });
 

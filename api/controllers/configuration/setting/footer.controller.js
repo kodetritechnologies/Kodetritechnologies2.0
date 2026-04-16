@@ -46,13 +46,34 @@ export const createFooter = async (req, res) => {
       {
         upsert: true,
         new: true,
-      }
+      },
     );
     await adminsLogsHelper(req, "Footer create successfully");
     return res.status(200).json({
       status: "success",
       message: "Updated successfully",
       data: response,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      status: "error",
+      message: "Internal server error",
+      error: error.message,
+    });
+  }
+};
+
+// Frontend
+
+export const getFooterSettingByType = async (req, res) => {
+  try {
+    const { type } = req.params;
+
+    const result = await Footer.findOne({ type: type });
+    return res.status(200).json({
+      status: "success",
+      message: "Footer setting fetched successfully",
+      data: result,
     });
   } catch (error) {
     return res.status(500).json({

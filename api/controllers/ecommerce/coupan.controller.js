@@ -7,7 +7,7 @@ import {
 } from "../../helpers/mongooseHelper.js";
 import { slugGenerator } from "../../helpers/slugGenerator.js";
 import Coupan from "../../models/ecommerce/coupan.schema.js";
-import CoupanClaim from "../../models/ecommerce/CouponClaim.js";
+import CoupanClaim from "../../models/ecommerce/couponClaim.js";
 import Cart from "../../models/ecommerce/cart.schema.js";
 import Order from "../../models/ecommerce/order.schema.js";
 

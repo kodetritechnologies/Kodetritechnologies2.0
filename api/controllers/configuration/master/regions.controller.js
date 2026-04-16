@@ -6,8 +6,10 @@ import { generateOptions } from "../../../helpers/mongooseHelper.js";
 
 export const createRegions = async (req, res) => {
   try {
-    const { _id,  } = req.admin;
-    const { name, type, parent } = req.body;
+    let { name, type, parent } = req.body;
+    if (typeof name === "string") {
+      name = [name];
+    }
 
     if (!Array.isArray(name) || name.length === 0) {
       return res.status(400).json({
@@ -25,8 +27,6 @@ export const createRegions = async (req, res) => {
         name: singleName,
         slug,
         type,
-        admin: _id,
-
         parent: parent || null,
       };
 
@@ -55,10 +55,8 @@ export const createRegions = async (req, res) => {
 
 export const regionsTypes = async (req, res) => {
   try {
-    const { _id,  } = req.admin;
 
     const query = {
-      admin: new mongoose.Types.ObjectId(_id),
       deletedAt: null,
       parent: null,
     };
@@ -111,12 +109,10 @@ export const regionsTypes = async (req, res) => {
 
 export const getRegionsById = async (req, res) => {
   try {
-    const { _id,  } = req.admin;
     const { id } = req.params;
 
     const region = await Regions.findOne({
       _id: new mongoose.Types.ObjectId(id),
-      admin: new mongoose.Types.ObjectId(_id),
       deletedAt: null,
     }).populate("parent", "name _id");
 
@@ -143,11 +139,9 @@ export const getRegionsById = async (req, res) => {
 
 export const regionsByType = async (req, res) => {
   try {
-    const { _id,  } = req.admin;
     const { type } = req.params;
     const query = {
       type: type,
-      admin: new mongoose.Types.ObjectId(_id),
       deletedAt: null,
     };
 
@@ -171,13 +165,11 @@ export const regionsByType = async (req, res) => {
 
 export const updateRegions = async (req, res) => {
   try {
-    const { _id,  } = req.admin;
     const { id } = req.params;
     const { name, type, parent } = req.body;
 
     const region = await Regions.findOne({
       _id: id,
-      admin: new mongoose.Types.ObjectId(_id),
       deletedAt: null,
     });
 
@@ -221,12 +213,10 @@ export const updateRegions = async (req, res) => {
 
 export const deleteRegions = async (req, res) => {
   try {
-    const { _id,  } = req.admin;
     const { id } = req.params;
 
     const region = await Regions.findOne({
       _id: id,
-      admin: new mongoose.Types.ObjectId(_id),
     });
 
     if (!region) {
@@ -263,3 +253,38 @@ export const deleteRegions = async (req, res) => {
     });
   }
 };
+
+export const getRegionsPublicByType = async (req, res) => {
+  try {
+    const { type } = req.params;
+    const { parent } = req.query;
+
+    const query = {
+      type: type,
+      deletedAt: null,
+    };
+
+    if (parent) {
+      query.parent = parent;
+    }
+
+    const options = generateOptions(req);
+    const result = await Regions.paginate(query, {
+      ...options,
+      select: "name _id parent type",
+    });
+
+    return res.status(200).json({
+      status: "success",
+      message: `${type} regions fetched successfully`,
+      data: result,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      status: "error",
+      message: "Internal server error",
+      error: error.message,
+    });
+  }
+};
+

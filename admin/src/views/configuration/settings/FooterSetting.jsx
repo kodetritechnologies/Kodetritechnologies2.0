@@ -11,6 +11,7 @@ import { useEffect, useState } from "react";
 import handleSubmitHelper from "../../../helpers/handleSubmitHelper";
 import BasicProvider from "../../../authentications/BasicProvider";
 import toast from "react-hot-toast";
+import JoditTextEditor from "../../../components/textEditor/JoditTextEditor";
 
 function FooterSetting() {
   const basicProvider = BasicProvider();
@@ -61,7 +62,7 @@ function FooterSetting() {
   const fetchAddressData = async (type) => {
     try {
       const response = await basicProvider.getMethod(
-        `configuration/footer/type/${type}`
+        `configuration/footer/type/${type}`,
       );
       if (response.status === "success") {
         setAddress(response?.data?.value);
@@ -73,7 +74,7 @@ function FooterSetting() {
   const fetchSocialData = async (type) => {
     try {
       const response = await basicProvider.getMethod(
-        `configuration/footer/type/${type}`
+        `configuration/footer/type/${type}`,
       );
       if (response.status === "success") {
         setSocialLinks(response?.data?.value);
@@ -86,7 +87,7 @@ function FooterSetting() {
   const fetchShippingdata = async (type) => {
     try {
       const response = await basicProvider.getMethod(
-        `configuration/footer/type/${type}`
+        `configuration/footer/type/${type}`,
       );
       if (response.status === "success") {
         setShipping(response?.data?.value);
@@ -99,7 +100,7 @@ function FooterSetting() {
   const fetchQucikLinksdata = async (type) => {
     try {
       const response = await basicProvider.getMethod(
-        `configuration/footer/type/${type}`
+        `configuration/footer/type/${type}`,
       );
       if (response.status === "success") {
         setQuickLinks((pre) => ({
@@ -114,7 +115,7 @@ function FooterSetting() {
   const fetchSupportLinksdata = async (type) => {
     try {
       const response = await basicProvider.getMethod(
-        `configuration/footer/type/${type}`
+        `configuration/footer/type/${type}`,
       );
       if (response.status === "success") {
         setSupportLinks((pre) => ({
@@ -147,7 +148,7 @@ function FooterSetting() {
     if (data) {
       const response = await basicProvider.postMethod(
         `configuration/footer/create`,
-        data
+        data,
       );
 
       if (response.status === "success") {
@@ -330,9 +331,18 @@ function FooterSetting() {
         <TableLayoutComp title={"Quick Links"}>
           <div className="quickLinkCard cp">
             <div>
-              <SummernoteEditor
+              {/* <SummernoteEditor
                 initialValues={quickLinks?.content}
                 setInitialValues={setQuickLinks}
+              /> */}
+              <JoditTextEditor
+                initialValues={quickLinks?.content}
+                setInitialValues={(value) => {
+                  setQuickLinks((pre) => ({
+                    ...pre,
+                    content: value,
+                  }));
+                }}
               />
             </div>
             <div className="cmt">
@@ -348,9 +358,18 @@ function FooterSetting() {
         <TableLayoutComp title={"Support Links"}>
           <div className="supportCard cp">
             <div>
-              <SummernoteEditor
+              {/* <SummernoteEditor
                 initialValues={supportLinks?.content}
                 setInitialValues={setSupportLinks}
+              /> */}
+              <JoditTextEditor
+                initialValues={supportLinks?.content}
+                setInitialValues={(value) => {
+                  setSupportLinks((pre) => ({
+                    ...pre,
+                    content: value,
+                  }));
+                }}
               />
             </div>
             <div className="cmt">

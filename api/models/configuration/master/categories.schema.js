@@ -21,10 +21,9 @@ const categoriesSchema = new mongoose.Schema(
         default: null,
       },
     ],
-    admin: {
+    featured_image: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Admin",
-      required: true,
+      ref: "File",
     },
     deletedAt: {
       type: Date,
@@ -37,11 +36,13 @@ const categoriesSchema = new mongoose.Schema(
 categoriesSchema.pre("find", function (next) {
   // this.populate("parent");
   this.populate("children");
+  this.populate("featured_image");
   next();
 });
 categoriesSchema.pre("findOne", function (next) {
   // this.populate("parent");
   this.populate("children");
+  this.populate("featured_image");
   next();
 });
 

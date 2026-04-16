@@ -10,10 +10,7 @@ import mongoose from "mongoose";
 
 export const getSupportTicketAdmin = async (req, res) => {
   try {
-    const {  } = req.admin;
     const query = GenerateSearchQuery(req, {
-      
-      type: "admin",
       deletedAt: null,
     });
 
@@ -68,7 +65,6 @@ export const getAllAdminCustomerSupportTicket = async (req, res) => {
 
 export const generateSupportTicketAdmin = async (req, res) => {
   try {
-    const { _id,  } = req.admin;
     const body = req.body;
 
     let galleryIds = [];
@@ -81,8 +77,7 @@ export const generateSupportTicketAdmin = async (req, res) => {
     const payload = {
       subject: body.subject,
       priority: body.priority,
-      admin: _id,
-      
+      customer: body.customer,
       type: "admin",
       ticket_no: `TCK-${generateId()}`,
       message: [
@@ -112,7 +107,7 @@ export const generateSupportTicketAdmin = async (req, res) => {
 
 export const getSupportTicketByIdAdmin = async (req, res) => {
   try {
-    const {  } = req.admin;
+    const {} = req.admin;
     const { id } = req.params;
     const query = {
       _id: id,
@@ -138,7 +133,6 @@ export const replySupportTicketAdmin = async (req, res) => {
   try {
     let data = req.body;
     const { id } = req.params;
-    const {  } = req.admin;
 
     const query = {
       _id: id,
@@ -187,8 +181,8 @@ export const replySupportTicketAdmin = async (req, res) => {
 export const deleteSupportTicketAdmin = async (req, res) => {
   try {
     const { id } = req.params;
-    const {  } = req.admin;
-    const query = { _id: id,  deletedAt: null };
+    const {} = req.admin;
+    const query = { _id: id, deletedAt: null };
     const deleteSupportTicket = await SupportTicket.deleteOne(query);
 
     if (!deleteSupportTicket) {
@@ -213,10 +207,8 @@ export const deleteSupportTicketAdmin = async (req, res) => {
 
 export const multiDeleteSupportTicketAdmin = async (req, res) => {
   try {
-    const {  } = req.admin;
     const ids = req.body;
     const query = {
-      
       deletedAt: null,
       _id: { $in: ids },
     };
@@ -249,7 +241,7 @@ export const multiDeleteSupportTicketAdmin = async (req, res) => {
 export const getAdminCustomerSupport = async (req, res) => {
   try {
     const { id } = req.params;
-    const {  } = req.admin;
+    const {} = req.admin;
     const query = {
       customer: new mongoose.Types.ObjectId(id),
       type: "customer",
@@ -274,16 +266,56 @@ export const getAdminCustomerSupport = async (req, res) => {
 
 export const getAllSupportTicketCustomer = async (req, res) => {
   try {
-  } catch (error) {}
+    const query = GenerateSearchQuery(req, {
+      customer: req.customer._id,
+      deletedAt: null,
+    });
+
+    const options = {
+      ...generateOptions(req),
+      sort: {
+        createdAt: -1,
+      },
+    };
+    const result = await SupportTicket.paginate(query, options);
+    return res.status(200).json({
+      status: "success",
+      message: "Customer Support Ticket fetch successfully",
+      data: result,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      status: "error",
+      message: "Internal server error",
+      error: error.message,
+    });
+  }
 };
 
 export const createSupportTicketCustomer = async (req, res) => {
   try {
-    const { _id,  } = req.customer;
-    const data = req.body;
+    const { _id } = req.customer;
+    const body = req.body;
+    let galleryIds = [];
+
+    if (req.files?.gallery && req.files.gallery.length > 0) {
+      const { gallery } = await fileUploads(req);
+      galleryIds = gallery?.map((file) => file?._id) || [];
+    }
+
     const payload = {
-      ...data,
+      subject: body.subject,
+      priority: body.priority,
       customer: _id,
+      type: "customer",
+      ticket_no: `TCK-${generateId()}`,
+      message: [
+        {
+          from: "customer",
+          message: body.message,
+          gallery: galleryIds,
+        },
+      ],
     };
 
     await SupportTicket.create(payload);
@@ -303,20 +335,34 @@ export const createSupportTicketCustomer = async (req, res) => {
 export const replySupportTicketCustomer = async (req, res) => {
   try {
     const data = req.body;
-    const { _id,  } = req.customer;
+    const { id } = req.params;
 
     const query = {
-      customer: _id,
+      _id: id,
       deletedAt: null,
     };
 
+    let galleryIds = [];
+
+    if (req.files?.gallery && req.files.gallery.length > 0) {
+      const { gallery } = await fileUploads(req);
+      galleryIds = gallery?.map((file) => file?._id) || [];
+    }
+
+    if (galleryIds?.length > 0) {
+      data.gallery = galleryIds;
+    } else {
+      delete data.gallery;
+    }
+
     const message = {
       from: "customer",
-      message: data.message,
-      gallery: data.gallery,
+      message: data?.message,
+      gallery: data?.gallery || [],
     };
 
     const payload = {
+      $set: { status: data.status },
       $push: { message: message },
     };
 
@@ -337,8 +383,8 @@ export const replySupportTicketCustomer = async (req, res) => {
 export const deleteSupportTicketCustomer = async (req, res) => {
   try {
     const { id } = req.params;
-    const { _id,  } = req.customer;
-    const query = { _id: id, customer: _id,  deletedAt: null };
+    const { _id } = req.customer;
+    const query = { _id: id, customer: _id, deletedAt: null };
     const deleteSupportTicket = await SupportTicket.deleteOne(query);
 
     if (!deleteSupportTicket) {
@@ -360,3 +406,69 @@ export const deleteSupportTicketCustomer = async (req, res) => {
     });
   }
 };
+
+export const getSupportTicketByIdCustomer = async (req, res) => {
+  try {
+    const { _id } = req.customer;
+    const { id } = req.params;
+    const query = {
+      _id: id,
+      customer: _id,
+      deletedAt: null,
+    };
+
+    const result = await SupportTicket.findOne(query);
+    if (!result) {
+      return res.status(404).json({
+        status: "error",
+        message: "Support Ticket not found",
+      });
+    }
+    return res.status(200).json({
+      status: "success",
+      message: "Support Ticket fetch successfully",
+      data: result,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      status: "error",
+      message: "Internal server error",
+      error: error.message,
+    });
+  }
+};
+
+export const multiDeleteSupportTicketCustomer = async (req, res) => {
+  try {
+    const ids = req.body;
+    const { _id } = req.customer;
+    const query = {
+      deletedAt: null,
+      _id: { $in: ids },
+      customer: _id,
+    };
+    const AllSupportTicket = await SupportTicket.find(query);
+
+    if (!AllSupportTicket.length > 0) {
+      return res.status(404).json({
+        status: "error",
+        message: "Support Ticket not found",
+      });
+    }
+
+    await SupportTicket.deleteMany(query);
+    await adminsLogsHelper(req, "Support Ticket Multi deleted successfully");
+    return res.status(200).json({
+      status: "success",
+      message: "Support Ticket deleted successfully",
+    });
+  } catch (error) {
+    return res.status(500).json({
+      status: "error",
+      message: "Internal server error",
+      error: error.message,
+    });
+  }
+};
+
+

@@ -19,11 +19,6 @@ const supportTicketSchema = new mongoose.Schema(
       enum: ["open", "close"],
       default: "open",
     },
-    type: {
-      type: String,
-      enum: ["customer", "admin"],
-      default: "customer",
-    },
     message: [
       {
         from: {
@@ -49,10 +44,6 @@ const supportTicketSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "Customer",
     },
-    admin: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Admin",
-    },
     item: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Item",
@@ -62,12 +53,11 @@ const supportTicketSchema = new mongoose.Schema(
       default: null,
     },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 supportTicketSchema.pre(["find", "findOne"], function (next) {
   this.populate("customer")
-    .populate("admin")
     .populate("")
     .populate({
       path: "item",

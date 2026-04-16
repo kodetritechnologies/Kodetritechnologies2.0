@@ -1,0 +1,14 @@
+HTTrack3.49-2+htsswf+htsjava launched on Sun, 29 Mar 2026 07:16:15 at https://tfamerce.vercel.app/ +*.png +*.gif +*.jpg +*.jpeg +*.css +*.js -ad.doubleclick.net/* -mime:application/foobar
+(winhttrack -qwC2%Ps2u1%s%uN0%I0p3DaK0H0%kf2A25000%f#f -F "Mozilla/4.5 (compatible; HTTrack 3.0x; Windows 98)" -%F "<!-- Mirrored from %s%s by HTTrack Website Copier/3.x [XR&CO'2014], %s -->" -%l "en, *" https://tfamerce.vercel.app/ -O1 "D:\bacup\new-ecommerce" +*.png +*.gif +*.jpg +*.jpeg +*.css +*.js -ad.doubleclick.net/* -mime:application/foobar )
+
+Information, Warnings and Errors reported for this mirror:
+note:	the hts-log.txt file, and hts-cache folder, may contain sensitive information,
+	such as username/password authentication for websites mirrored in this project
+	do not share these files/folders if you want these information to remain private
+
+07:35:58	Warning: 	Retry after error -5 (error:00000005:lib(0):func(0):DH lib) at link https://tfamerce.vercel.app/blog.html (from https://tfamerce.vercel.app/)
+07:36:22	Warning: 	Retry after error -5 (error:00000005:lib(0):func(0):DH lib) at link https://tfamerce.vercel.app/term-and-condition.html (from https://tfamerce.vercel.app/)
+07:36:25	Error: 	"Not Found" (404) at link https://tfamerce.vercel.app/assets/images/product/product-15_5.jpg (from https://tfamerce.vercel.app/home-fashion.html)
+
+HTTrack Website Copier/3.49-2 mirror complete in 20 minutes 20 seconds : 1251 links scanned, 1247 files written (146049822 bytes overall) [96654796 bytes received at 79225 bytes/sec], 60286395 bytes transferred using HTTP compression in 155 files, ratio 16%
+(1 errors, 2 warnings, 0 messages)

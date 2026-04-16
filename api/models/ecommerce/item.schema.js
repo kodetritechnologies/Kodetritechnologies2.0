@@ -89,6 +89,10 @@ const itemSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    tranding: {
+      type: Boolean,
+      default: false,
+    },
     type: {
       type: String,
       default: "simple",
@@ -103,7 +107,7 @@ const itemSchema = new mongoose.Schema(
       default: null,
     },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 itemSchema.pre("find", function (next) {

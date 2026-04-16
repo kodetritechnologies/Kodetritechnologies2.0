@@ -5,6 +5,7 @@ import {
   GenerateSearchQuery,
 } from "../../helpers/mongooseHelper.js";
 import { adminsLogsHelper } from "../../helpers/adminsLogsHelper.js";
+import mongoose from "mongoose";
 
 // Admin
 export const getContactAdmin = async (req, res) => {
@@ -118,7 +119,7 @@ export const trashContactAdmin = async (req, res) => {
       { deletedAt: new Date() },
       {
         new: true,
-      }
+      },
     );
     await adminsLogsHelper(req, "Contact trash successfully");
     return res.status(200).json({
@@ -230,8 +231,11 @@ export const createContact = async (req, res) => {
   try {
     const data = req.body;
     const payload = {
-      ...data,
+      values: data,
     };
+    if (data?.customer) {
+      payload.customer = new mongoose.Types.ObjectId(data.customer);
+    }
     await Contact.create(payload);
     return res.status(201).json({
       status: "success",
