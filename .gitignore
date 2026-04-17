@@ -24,14 +24,13 @@ Thumbs.db
 /admin/.vite
 /admin/.eslintcache
 
-# --- Frontend (React + Vite) ---
-/frontend/node_modules/
-/frontend/dist/
-/frontend/.vite
-/frontend/.eslintcache
+# --- Frontend (React + Vite / Next JS) ---
+/frontend-echoswap/node_modules/
+/frontend-echoswap/dist/
+/frontend-echoswap/.vite
+/frontend-echoswap/.eslintcache
 /frontend/.next
-/frontend/.next/dev/lock
-
+/frontend/node_modules
 
 # --- Backend (Node + Express) ---
 /api/node_modules/
