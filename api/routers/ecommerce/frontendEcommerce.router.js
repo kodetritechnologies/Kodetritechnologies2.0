@@ -10,6 +10,7 @@ import {
 import {
   getPublicItemBySlugOrId,
   getPublicItems,
+  getRelatedItems,
 } from "../../controllers/ecommerce/item.controller.js";
 import {
   claimCoupan,
@@ -48,6 +49,7 @@ router.delete(
 // Item
 
 router.get("/item/all", getPublicItems);
+router.get("/item/related/:id", getRelatedItems);
 router.get("/item/:id", getPublicItemBySlugOrId);
 
 // Coupan

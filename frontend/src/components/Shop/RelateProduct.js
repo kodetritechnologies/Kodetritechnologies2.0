@@ -1,4 +1,21 @@
-function RelateProduct() {
+import { priceHelper, productUrl } from "@/utils/helpers/productHelper";
+import { serviceProvider } from "@/utils/serviceProvider";
+import Link from "next/link";
+import QuickViewButton from "@/components/QuickViewButton";
+
+async function RelateProduct({ productId }) {
+
+  const serverProvider = await serviceProvider();
+  const getRelatedProduct = async () => {
+    try {
+      const response = await serverProvider.getMethod(`public/ecommerce/item/related/${productId}?count=4`);
+      return response?.data?.data;
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const relatedProduct = await getRelatedProduct();
   return (
     <div class="flat-spacing flat-animate-tab pt-0">
       <div class="container">
@@ -14,16 +31,6 @@ function RelateProduct() {
               role="tab"
             >
               <span class="h4 fw-medium">Related Products</span>
-            </a>
-          </li>
-          <li class="nav-tab-item" role="presentation">
-            <a
-              href="#recently"
-              data-bs-toggle="tab"
-              class="tf-btn-tab"
-              role="tab"
-            >
-              <span class="h4 fw-medium">Recently Viewed</span>
             </a>
           </li>
         </ul>
@@ -44,998 +51,158 @@ function RelateProduct() {
               data-pagination-md="3"
               data-pagination-lg="4"
             >
-              <div class="swiper-wrapper">
-                <div class="swiper-slide">
-                  <div class="card-product">
-                    <div class="card-product_wrapper">
-                      <a href="product-detail.html" class="product-img">
-                        <img
-                          class="img-product"
-                          loading="lazy"
-                          width="330"
-                          height="440"
-                          src="/assets/images/product/product-1.jpg"
-                          alt="Product"
-                        />
-                        <img
-                          class="img-hover"
-                          loading="lazy"
-                          width="330"
-                          height="440"
-                          src="/assets/images/product/product-1_2.jpg"
-                          alt="Product"
-                        />
-                      </a>
-                      <ul class="product-action_list">
-                        <li class="wishlist">
-                          <a
-                            href="#;"
-                            class="hover-tooltip tooltip-left box-icon"
+              <div className="swiper-wrapper">
+                {relatedProduct?.map((product, index) => {
+                  const { price, sale_price } = priceHelper(product);
+                  const url = productUrl(product);
+                  return (
+                    <div className="swiper-slide wow fadeInUp" key={index}>
+                      <div className="card-product">
+                        <div className="card-product_wrapper">
+                          {product?.type == "simple" ? (
+                            <Link href={url} className="product-img">
+                              <img
+                                className="img-product"
+                                loading="lazy"
+                                width="330"
+                                height="440"
+                                src={product?.gallery?.[0]?.url}
+                                alt="Product"
+                              />
+
+                              <img
+                                className="img-hover"
+                                loading="lazy"
+                                width="330"
+                                height="440"
+                                src={
+                                  product?.gallery?.[1]?.url ||
+                                  product?.gallery?.[0]?.url
+                                }
+                                alt="Product"
+                              />
+                            </Link>
+                          ) : (
+                            <Link href={url} className="product-img">
+                              <img
+                                className="img-product"
+                                loading="lazy"
+                                width="330"
+                                height="440"
+                                src={product?.varients[0]?.gallery?.[0]?.url}
+                                alt="Product"
+                              />
+
+                              <img
+                                className="img-hover"
+                                loading="lazy"
+                                width="330"
+                                height="440"
+                                src={product?.varients[0]?.gallery?.[1]?.url}
+                                alt="Product"
+                              />
+                            </Link>
+                          )}
+                          <ul className="product-action_list">
+                            <li className="wishlist">
+                              <a
+                                href="#;"
+                                className="hover-tooltip tooltip-left box-icon"
+                              >
+                                <span className="icon icon-heart"></span>
+                                <span className="tooltip">Add to Wishlist</span>
+                              </a>
+                            </li>
+                            <li className="compare">
+                              <a
+                                href="#compare"
+                                data-bs-toggle="offcanvas"
+                                className="hover-tooltip tooltip-left box-icon"
+                              >
+                                <span className="icon icon-ArrowsLeftRight"></span>
+                                <span className="tooltip">Compare</span>
+                              </a>
+                            </li>
+                            <li>
+                              <QuickViewButton product={product} />
+                            </li>
+                          </ul>
+                          <ul className="product-badge_list">
+                            <li className="product-badge_item text-caption-01 new">
+                              NEW
+                            </li>
+                          </ul>
+                          <div className="product-action_bot">
+                            <a
+                              href="#quickAdd"
+                              data-bs-toggle="modal"
+                              className="tf-btn btn-white small  w-100"
+                            >
+                              Quick Add
+                            </a>
+                          </div>
+                          <div className="product-marquee_sale">
+                            <div className="marquee-wrapper">
+                              <div className="initial-child-container">
+                                <div className="marquee-child-item">
+                                  HOT SALE 25% OFF
+                                </div>
+                                <i className="icon icon-Star2"></i>
+                                <div className="marquee-child-item">
+                                  HOT SALE 25% OFF
+                                </div>
+                                <i className="icon icon-Star2"></i>
+                                <div className="marquee-child-item">
+                                  HOT SALE 25% OFF
+                                </div>
+                                <i className="icon icon-Star2"></i>
+                                <div className="marquee-child-item">
+                                  HOT SALE 25% OFF
+                                </div>
+                                <i className="icon icon-Star2"></i>
+                                <div className="marquee-child-item">
+                                  HOT SALE 25% OFF
+                                </div>
+                                <i className="icon icon-Star2"></i>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="card-product_info">
+                          <Link
+                            href={url}
+                            className="name-product lh-24 fw-medium link-underline-text"
                           >
-                            <span class="icon icon-heart"></span>
-                            <span class="tooltip">Add to Wishlist</span>
-                          </a>
-                        </li>
-                        <li class="compare">
-                          <a
-                            href="#compare"
-                            data-bs-toggle="offcanvas"
-                            class="hover-tooltip tooltip-left box-icon"
-                          >
-                            <span class="icon icon-ArrowsLeftRight"></span>
-                            <span class="tooltip">Compare</span>
-                          </a>
-                        </li>
-                        <li>
-                          <a
-                            href="#quickView"
-                            data-bs-toggle="offcanvas"
-                            class="hover-tooltip tooltip-left box-icon"
-                          >
-                            <span class="icon icon-Eye"></span>
-                            <span class="tooltip">Quick view</span>
-                          </a>
-                        </li>
-                      </ul>
-                      <ul class="product-badge_list">
-                        <li class="product-badge_item text-caption-01 new">
-                          NEW
-                        </li>
-                      </ul>
-                      <div class="product-action_bot">
-                        <a
-                          href="#quickAdd"
-                          data-bs-toggle="modal"
-                          class="tf-btn btn-white small  w-100"
-                        >
-                          Quick Add
-                        </a>
-                      </div>
-                      <div class="product-marquee_sale">
-                        <div class="marquee-wrapper">
-                          <div class="initial-child-container">
-                            <div class="marquee-child-item">
-                              HOT SALE 25% OFF
-                            </div>
-                            <i class="icon icon-Star2"></i>
-                            <div class="marquee-child-item">
-                              HOT SALE 25% OFF
-                            </div>
-                            <i class="icon icon-Star2"></i>
-                            <div class="marquee-child-item">
-                              HOT SALE 25% OFF
-                            </div>
-                            <i class="icon icon-Star2"></i>
-                            <div class="marquee-child-item">
-                              HOT SALE 25% OFF
-                            </div>
-                            <i class="icon icon-Star2"></i>
-                            <div class="marquee-child-item">
-                              HOT SALE 25% OFF
-                            </div>
-                            <i class="icon icon-Star2"></i>
+                            {product?.name}
+                          </Link>
+                          <div className="star-wrap d-flex align-items-center">
+                            <i className="icon icon-Star"></i>
+                            <i className="icon icon-Star"></i>
+                            <i className="icon icon-Star"></i>
+                            <i className="icon icon-Star"></i>
+                            <i className="icon icon-Star"></i>
+                          </div>
+                          <div className="price-wrap">
+                            {sale_price && sale_price != null ? (
+                              <span className="price-new text-primary fw-semibold">
+                                ${sale_price}
+                              </span>
+                            ) : (
+                              <span className="price-new text-primary fw-semibold">
+                                ${price}
+                              </span>
+                            )}
+                            {price && price != null && (
+                              <span className="price-old text-caption-01 cl-text-3">
+                                ${price}
+                              </span>
+                            )}
                           </div>
                         </div>
                       </div>
                     </div>
-                    <div class="card-product_info">
-                      <a
-                        href="product-detail.html"
-                        class="name-product lh-24 fw-medium link-underline-text"
-                      >
-                        Lyocell wrap top
-                      </a>
-                      <div class="star-wrap d-flex align-items-center">
-                        <i class="icon icon-Star"></i>
-                        <i class="icon icon-Star"></i>
-                        <i class="icon icon-Star"></i>
-                        <i class="icon icon-Star"></i>
-                        <i class="icon icon-Star"></i>
-                      </div>
-                      <div class="price-wrap">
-                        <span class="price-new text-primary fw-semibold">
-                          $69,99
-                        </span>
-                        <span class="price-old text-caption-01 cl-text-3">
-                          $99,99
-                        </span>
-                      </div>
-                      <ul class="product-color_list">
-                        <li class="product-color-item color-swatch hover-tooltip tooltip-bot active">
-                          <span class="tooltip color-filter">Brown</span>
-                          <span class="swatch-value bg-warm-beige"></span>
-                          <img
-                            src="/assets/images/product/product-1.jpg"
-                            data-src="/assets/images/product/product-1.jpg"
-                            alt="Image"
-                          />
-                        </li>
-                        <li class="product-color-item color-swatch hover-tooltip tooltip-bot">
-                          <span class="tooltip color-filter">Dark Blue</span>
-                          <span class="swatch-value bg-midnight-blue"></span>
-                          <img
-                            src="/assets/images/product/product-1_3.jpg"
-                            data-src="/assets/images/product/product-1_3.jpg"
-                            alt="Image"
-                          />
-                        </li>
-                        <li class="product-color-item color-swatch hover-tooltip tooltip-bot">
-                          <span class="tooltip color-filter">White</span>
-                          <span class="swatch-value bg-white"></span>
-                          <img
-                            src="/assets/images/product/product-1_4.jpg"
-                            data-src="/assets/images/product/product-1_4.jpg"
-                            alt="Image"
-                          />
-                        </li>
-                      </ul>
-                    </div>
-                  </div>
-                </div>
-                <div class="swiper-slide">
-                  <div class="card-product">
-                    <div class="card-product_wrapper">
-                      <a href="product-detail.html" class="product-img">
-                        <img
-                          class="img-product"
-                          loading="lazy"
-                          width="330"
-                          height="440"
-                          src="/assets/images/product/product-2.jpg"
-                          alt="Product"
-                        />
-                        <img
-                          class="img-hover"
-                          loading="lazy"
-                          width="330"
-                          height="440"
-                          src="/assets/images/product/product-2_2.jpg"
-                          alt="Product"
-                        />
-                      </a>
-                      <ul class="product-action_list">
-                        <li class="wishlist">
-                          <a
-                            href="#;"
-                            class="hover-tooltip tooltip-left box-icon"
-                          >
-                            <span class="icon icon-heart"></span>
-                            <span class="tooltip">Add to Wishlist</span>
-                          </a>
-                        </li>
-                        <li class="compare">
-                          <a
-                            href="#compare"
-                            data-bs-toggle="offcanvas"
-                            class="hover-tooltip tooltip-left box-icon"
-                          >
-                            <span class="icon icon-ArrowsLeftRight"></span>
-                            <span class="tooltip">Compare</span>
-                          </a>
-                        </li>
-                        <li>
-                          <a
-                            href="#quickView"
-                            data-bs-toggle="offcanvas"
-                            class="hover-tooltip tooltip-left box-icon"
-                          >
-                            <span class="icon icon-Eye"></span>
-                            <span class="tooltip">Quick view</span>
-                          </a>
-                        </li>
-                      </ul>
-                      <ul class="product-badge_list">
-                        <li class="product-badge_item text-caption-01 sale">
-                          -25%
-                        </li>
-                      </ul>
-                      <div class="product-action_bot">
-                        <a
-                          href="#quickAdd"
-                          data-bs-toggle="modal"
-                          class="tf-btn btn-white small  w-100"
-                        >
-                          Quick Add
-                        </a>
-                      </div>
-                    </div>
-                    <div class="card-product_info">
-                      <a
-                        href="product-detail.html"
-                        class="name-product lh-24 fw-medium link-underline-text"
-                      >
-                        Buttons cotton top
-                      </a>
-                      <div class="star-wrap d-flex align-items-center">
-                        <i class="icon icon-Star"></i>
-                        <i class="icon icon-Star"></i>
-                        <i class="icon icon-Star"></i>
-                        <i class="icon icon-Star"></i>
-                        <i class="icon icon-Star"></i>
-                      </div>
-                      <div class="price-wrap">
-                        <span class="price-new text-primary fw-semibold">
-                          $29,99
-                        </span>
-                        <span class="price-old text-caption-01 cl-text-3">
-                          $49,99
-                        </span>
-                      </div>
-                      <ul class="product-color_list">
-                        <li class="product-color-item color-swatch hover-tooltip tooltip-bot active">
-                          <span class="tooltip color-filter">Brown</span>
-                          <span class="swatch-value bg-warm-brown"></span>
-                          <img
-                            src="/assets/images/product/product-2.jpg"
-                            data-src="/assets/images/product/product-2.jpg"
-                            alt="Image"
-                          />
-                        </li>
-                        <li class="product-color-item color-swatch hover-tooltip tooltip-bot">
-                          <span class="tooltip color-filter">Beige</span>
-                          <span class="swatch-value bg-beige"></span>
-                          <img
-                            src="/assets/images/product/product-2_3.jpg"
-                            data-src="/assets/images/product/product-2_3.jpg"
-                            alt="Image"
-                          />
-                        </li>
-                      </ul>
-                    </div>
-                  </div>
-                </div>
-                <div class="swiper-slide">
-                  <div class="card-product">
-                    <div class="card-product_wrapper">
-                      <a href="product-detail.html" class="product-img">
-                        <img
-                          class="img-product"
-                          loading="lazy"
-                          width="330"
-                          height="440"
-                          src="/assets/images/product/product-3.jpg"
-                          alt="Product"
-                        />
-                        <img
-                          class="img-hover"
-                          loading="lazy"
-                          width="330"
-                          height="440"
-                          src="/assets/images/product/product-3_2.jpg"
-                          alt="Product"
-                        />
-                      </a>
-                      <ul class="product-action_list">
-                        <li class="wishlist">
-                          <a
-                            href="#;"
-                            class="hover-tooltip tooltip-left box-icon"
-                          >
-                            <span class="icon icon-heart"></span>
-                            <span class="tooltip">Add to Wishlist</span>
-                          </a>
-                        </li>
-                        <li class="compare">
-                          <a
-                            href="#compare"
-                            data-bs-toggle="offcanvas"
-                            class="hover-tooltip tooltip-left box-icon"
-                          >
-                            <span class="icon icon-ArrowsLeftRight"></span>
-                            <span class="tooltip">Compare</span>
-                          </a>
-                        </li>
-                        <li>
-                          <a
-                            href="#quickView"
-                            data-bs-toggle="offcanvas"
-                            class="hover-tooltip tooltip-left box-icon"
-                          >
-                            <span class="icon icon-Eye"></span>
-                            <span class="tooltip">Quick view</span>
-                          </a>
-                        </li>
-                      </ul>
-                      <ul class="product-badge_list">
-                        <li class="product-badge_item text-caption-01 sale">
-                          -25%
-                        </li>
-                      </ul>
-                      <div class="product-action_bot">
-                        <a
-                          href="#quickAdd"
-                          data-bs-toggle="modal"
-                          class="tf-btn btn-white small  w-100"
-                        >
-                          Quick Add
-                        </a>
-                      </div>
-                    </div>
-                    <div class="card-product_info">
-                      <a
-                        href="product-detail.html"
-                        class="name-product lh-24 fw-medium link-underline-text"
-                      >
-                        Wool Midi Coat
-                      </a>
-                      <div class="star-wrap d-flex align-items-center">
-                        <i class="icon icon-Star"></i>
-                        <i class="icon icon-Star"></i>
-                        <i class="icon icon-Star"></i>
-                        <i class="icon icon-Star"></i>
-                        <i class="icon icon-Star"></i>
-                      </div>
-                      <div class="price-wrap">
-                        <span class="price-new text-primary fw-semibold">
-                          $15,99
-                        </span>
-                        <span class="price-old text-caption-01 cl-text-3">
-                          $25,99
-                        </span>
-                      </div>
-                      <ul class="product-color_list">
-                        <li class="product-color-item color-swatch hover-tooltip tooltip-bot active">
-                          <span class="tooltip color-filter">Brown</span>
-                          <span class="swatch-value bg-olive-brown"></span>
-                          <img
-                            src="/assets/images/product/product-3.jpg"
-                            data-src="/assets/images/product/product-3.jpg"
-                            alt="Image"
-                          />
-                        </li>
-                        <li class="product-color-item color-swatch hover-tooltip tooltip-bot">
-                          <span class="tooltip color-filter">Blue</span>
-                          <span class="swatch-value bg-dark-blue"></span>
-                          <img
-                            src="/assets/images/product/product-3_3.jpg"
-                            data-src="/assets/images/product/product-3_3.jpg"
-                            alt="Image"
-                          />
-                        </li>
-                        <li class="product-color-item color-swatch hover-tooltip tooltip-bot">
-                          <span class="tooltip color-filter">Light</span>
-                          <span class="swatch-value bg-warm-beige"></span>
-                          <img
-                            src="/assets/images/product/product-3_4.jpg"
-                            data-src="/assets/images/product/product-3_4.jpg"
-                            alt="Image"
-                          />
-                        </li>
-                      </ul>
-                    </div>
-                  </div>
-                </div>
-                <div class="swiper-slide">
-                  <div class="card-product">
-                    <div class="card-product_wrapper">
-                      <a href="product-detail.html" class="product-img">
-                        <img
-                          class="img-product"
-                          loading="lazy"
-                          width="330"
-                          height="440"
-                          src="/assets/images/product/product-4.jpg"
-                          alt="Product"
-                        />
-                        <img
-                          class="img-hover"
-                          loading="lazy"
-                          width="330"
-                          height="440"
-                          src="/assets/images/product/product-4_2.jpg"
-                          alt="Product"
-                        />
-                      </a>
-                      <ul class="product-action_list">
-                        <li class="wishlist">
-                          <a
-                            href="#;"
-                            class="hover-tooltip tooltip-left box-icon"
-                          >
-                            <span class="icon icon-heart"></span>
-                            <span class="tooltip">Add to Wishlist</span>
-                          </a>
-                        </li>
-                        <li class="compare">
-                          <a
-                            href="#compare"
-                            data-bs-toggle="offcanvas"
-                            class="hover-tooltip tooltip-left box-icon"
-                          >
-                            <span class="icon icon-ArrowsLeftRight"></span>
-                            <span class="tooltip">Compare</span>
-                          </a>
-                        </li>
-                        <li>
-                          <a
-                            href="#quickView"
-                            data-bs-toggle="offcanvas"
-                            class="hover-tooltip tooltip-left box-icon"
-                          >
-                            <span class="icon icon-Eye"></span>
-                            <span class="tooltip">Quick view</span>
-                          </a>
-                        </li>
-                      </ul>
-                      <div class="product-action_bot">
-                        <a
-                          href="#quickAdd"
-                          data-bs-toggle="modal"
-                          class="tf-btn btn-white small  w-100"
-                        >
-                          Quick Add
-                        </a>
-                      </div>
-                      <div class="product-countdown">
-                        <div
-                          class="js-countdown cd-has-zero"
-                          data-timer="1093120"
-                          data-labels="D : ,H : ,M : ,S"
-                        ></div>
-                      </div>
-                    </div>
-                    <div class="card-product_info">
-                      <a
-                        href="product-detail.html"
-                        class="name-product lh-24 fw-medium link-underline-text"
-                      >
-                        linen slim-fit shirt
-                      </a>
-                      <div class="star-wrap d-flex align-items-center">
-                        <i class="icon icon-Star"></i>
-                        <i class="icon icon-Star"></i>
-                        <i class="icon icon-Star"></i>
-                        <i class="icon icon-Star"></i>
-                        <i class="icon icon-Star"></i>
-                      </div>
-                      <div class="price-wrap">
-                        <span class="price-new text-primary fw-semibold">
-                          $45,99
-                        </span>
-                        <span class="price-old text-caption-01 cl-text-3">
-                          $79,99
-                        </span>
-                      </div>
-                      <ul class="product-color_list">
-                        <li class="product-color-item color-swatch hover-tooltip tooltip-bot active">
-                          <span class="tooltip color-filter">Blue</span>
-                          <span class="swatch-value bg-dark-blue-2"></span>
-                          <img
-                            src="/assets/images/product/product-4.jpg"
-                            data-src="/assets/images/product/product-4.jpg"
-                            alt="Image"
-                          />
-                        </li>
-                      </ul>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div class="sw-line-default style-2 tf-sw-pagination"></div>
-            </div>
-          </div>
-          <div class="tab-pane" id="recently" role="tabpanel">
-            <div
-              dir="ltr"
-              class="swiper tf-swiper wrap-sw-over"
-              data-preview="4"
-              data-tablet="3"
-              data-mobile-sm="2"
-              data-mobile="2"
-              data-space-lg="30"
-              data-space-md="20"
-              data-space="10"
-              data-pagination="2"
-              data-pagination-sm="2"
-              data-pagination-md="3"
-              data-pagination-lg="4"
-            >
-              <div class="swiper-wrapper">
-                <div class="swiper-slide">
-                  <div class="card-product">
-                    <div class="card-product_wrapper">
-                      <a href="product-detail.html" class="product-img">
-                        <img
-                          class="img-product"
-                          loading="lazy"
-                          width="330"
-                          height="440"
-                          src="/assets/images/product/product-3.jpg"
-                          alt="Product"
-                        />
-                        <img
-                          class="img-hover"
-                          loading="lazy"
-                          width="330"
-                          height="440"
-                          src="/assets/images/product/product-3_2.jpg"
-                          alt="Product"
-                        />
-                      </a>
-                      <ul class="product-action_list">
-                        <li class="wishlist">
-                          <a
-                            href="#;"
-                            class="hover-tooltip tooltip-left box-icon"
-                          >
-                            <span class="icon icon-heart"></span>
-                            <span class="tooltip">Add to Wishlist</span>
-                          </a>
-                        </li>
-                        <li class="compare">
-                          <a
-                            href="#compare"
-                            data-bs-toggle="offcanvas"
-                            class="hover-tooltip tooltip-left box-icon"
-                          >
-                            <span class="icon icon-ArrowsLeftRight"></span>
-                            <span class="tooltip">Compare</span>
-                          </a>
-                        </li>
-                        <li>
-                          <a
-                            href="#quickView"
-                            data-bs-toggle="offcanvas"
-                            class="hover-tooltip tooltip-left box-icon"
-                          >
-                            <span class="icon icon-Eye"></span>
-                            <span class="tooltip">Quick view</span>
-                          </a>
-                        </li>
-                      </ul>
-                      <ul class="product-badge_list">
-                        <li class="product-badge_item text-caption-01 sale">
-                          -25%
-                        </li>
-                      </ul>
-                      <div class="product-action_bot">
-                        <a
-                          href="#quickAdd"
-                          data-bs-toggle="modal"
-                          class="tf-btn btn-white small  w-100"
-                        >
-                          Quick Add
-                        </a>
-                      </div>
-                    </div>
-                    <div class="card-product_info">
-                      <a
-                        href="product-detail.html"
-                        class="name-product lh-24 fw-medium link-underline-text"
-                      >
-                        Wool Midi Coat
-                      </a>
-                      <div class="star-wrap d-flex align-items-center">
-                        <i class="icon icon-Star"></i>
-                        <i class="icon icon-Star"></i>
-                        <i class="icon icon-Star"></i>
-                        <i class="icon icon-Star"></i>
-                        <i class="icon icon-Star"></i>
-                      </div>
-                      <div class="price-wrap">
-                        <span class="price-new text-primary fw-semibold">
-                          $15,99
-                        </span>
-                        <span class="price-old text-caption-01 cl-text-3">
-                          $25,99
-                        </span>
-                      </div>
-                      <ul class="product-color_list">
-                        <li class="product-color-item color-swatch hover-tooltip tooltip-bot active">
-                          <span class="tooltip color-filter">Brown</span>
-                          <span class="swatch-value bg-olive-brown"></span>
-                          <img
-                            src="/assets/images/product/product-3.jpg"
-                            data-src="/assets/images/product/product-3.jpg"
-                            alt="Image"
-                          />
-                        </li>
-                        <li class="product-color-item color-swatch hover-tooltip tooltip-bot">
-                          <span class="tooltip color-filter">Blue</span>
-                          <span class="swatch-value bg-dark-blue"></span>
-                          <img
-                            src="/assets/images/product/product-3_3.jpg"
-                            data-src="/assets/images/product/product-3_3.jpg"
-                            alt="Image"
-                          />
-                        </li>
-                        <li class="product-color-item color-swatch hover-tooltip tooltip-bot">
-                          <span class="tooltip color-filter">Light</span>
-                          <span class="swatch-value bg-warm-beige"></span>
-                          <img
-                            src="/assets/images/product/product-3_4.jpg"
-                            data-src="/assets/images/product/product-3_4.jpg"
-                            alt="Image"
-                          />
-                        </li>
-                      </ul>
-                    </div>
-                  </div>
-                </div>
-                <div class="swiper-slide">
-                  <div class="card-product">
-                    <div class="card-product_wrapper">
-                      <a href="product-detail.html" class="product-img">
-                        <img
-                          class="img-product"
-                          loading="lazy"
-                          width="330"
-                          height="440"
-                          src="/assets/images/product/product-4.jpg"
-                          alt="Product"
-                        />
-                        <img
-                          class="img-hover"
-                          loading="lazy"
-                          width="330"
-                          height="440"
-                          src="/assets/images/product/product-4_2.jpg"
-                          alt="Product"
-                        />
-                      </a>
-                      <ul class="product-action_list">
-                        <li class="wishlist">
-                          <a
-                            href="#;"
-                            class="hover-tooltip tooltip-left box-icon"
-                          >
-                            <span class="icon icon-heart"></span>
-                            <span class="tooltip">Add to Wishlist</span>
-                          </a>
-                        </li>
-                        <li class="compare">
-                          <a
-                            href="#compare"
-                            data-bs-toggle="offcanvas"
-                            class="hover-tooltip tooltip-left box-icon"
-                          >
-                            <span class="icon icon-ArrowsLeftRight"></span>
-                            <span class="tooltip">Compare</span>
-                          </a>
-                        </li>
-                        <li>
-                          <a
-                            href="#quickView"
-                            data-bs-toggle="offcanvas"
-                            class="hover-tooltip tooltip-left box-icon"
-                          >
-                            <span class="icon icon-Eye"></span>
-                            <span class="tooltip">Quick view</span>
-                          </a>
-                        </li>
-                      </ul>
-                      <div class="product-action_bot">
-                        <a
-                          href="#quickAdd"
-                          data-bs-toggle="modal"
-                          class="tf-btn btn-white small  w-100"
-                        >
-                          Quick Add
-                        </a>
-                      </div>
-                      <div class="product-countdown">
-                        <div
-                          class="js-countdown cd-has-zero"
-                          data-timer="1093120"
-                          data-labels="D : ,H : ,M : ,S"
-                        ></div>
-                      </div>
-                    </div>
-                    <div class="card-product_info">
-                      <a
-                        href="product-detail.html"
-                        class="name-product lh-24 fw-medium link-underline-text"
-                      >
-                        linen slim-fit shirt
-                      </a>
-                      <div class="star-wrap d-flex align-items-center">
-                        <i class="icon icon-Star"></i>
-                        <i class="icon icon-Star"></i>
-                        <i class="icon icon-Star"></i>
-                        <i class="icon icon-Star"></i>
-                        <i class="icon icon-Star"></i>
-                      </div>
-                      <div class="price-wrap">
-                        <span class="price-new text-primary fw-semibold">
-                          $45,99
-                        </span>
-                        <span class="price-old text-caption-01 cl-text-3">
-                          $79,99
-                        </span>
-                      </div>
-                      <ul class="product-color_list">
-                        <li class="product-color-item color-swatch hover-tooltip tooltip-bot active">
-                          <span class="tooltip color-filter">Blue</span>
-                          <span class="swatch-value bg-dark-blue-2"></span>
-                          <img
-                            src="/assets/images/product/product-4.jpg"
-                            data-src="/assets/images/product/product-4.jpg"
-                            alt="Image"
-                          />
-                        </li>
-                      </ul>
-                    </div>
-                  </div>
-                </div>
-                <div class="swiper-slide">
-                  <div class="card-product">
-                    <div class="card-product_wrapper">
-                      <a href="product-detail.html" class="product-img">
-                        <img
-                          class="img-product"
-                          loading="lazy"
-                          width="330"
-                          height="440"
-                          src="/assets/images/product/product-1.jpg"
-                          alt="Product"
-                        />
-                        <img
-                          class="img-hover"
-                          loading="lazy"
-                          width="330"
-                          height="440"
-                          src="/assets/images/product/product-1_2.jpg"
-                          alt="Product"
-                        />
-                      </a>
-                      <ul class="product-action_list">
-                        <li class="wishlist">
-                          <a
-                            href="#;"
-                            class="hover-tooltip tooltip-left box-icon"
-                          >
-                            <span class="icon icon-heart"></span>
-                            <span class="tooltip">Add to Wishlist</span>
-                          </a>
-                        </li>
-                        <li class="compare">
-                          <a
-                            href="#compare"
-                            data-bs-toggle="offcanvas"
-                            class="hover-tooltip tooltip-left box-icon"
-                          >
-                            <span class="icon icon-ArrowsLeftRight"></span>
-                            <span class="tooltip">Compare</span>
-                          </a>
-                        </li>
-                        <li>
-                          <a
-                            href="#quickView"
-                            data-bs-toggle="offcanvas"
-                            class="hover-tooltip tooltip-left box-icon"
-                          >
-                            <span class="icon icon-Eye"></span>
-                            <span class="tooltip">Quick view</span>
-                          </a>
-                        </li>
-                      </ul>
-                      <ul class="product-badge_list">
-                        <li class="product-badge_item text-caption-01 new">
-                          NEW
-                        </li>
-                      </ul>
-                      <div class="product-action_bot">
-                        <a
-                          href="#quickAdd"
-                          data-bs-toggle="modal"
-                          class="tf-btn btn-white small  w-100"
-                        >
-                          Quick Add
-                        </a>
-                      </div>
-                      <div class="product-marquee_sale">
-                        <div class="marquee-wrapper">
-                          <div class="initial-child-container">
-                            <div class="marquee-child-item">
-                              HOT SALE 25% OFF
-                            </div>
-                            <i class="icon icon-Star2"></i>
-                            <div class="marquee-child-item">
-                              HOT SALE 25% OFF
-                            </div>
-                            <i class="icon icon-Star2"></i>
-                            <div class="marquee-child-item">
-                              HOT SALE 25% OFF
-                            </div>
-                            <i class="icon icon-Star2"></i>
-                            <div class="marquee-child-item">
-                              HOT SALE 25% OFF
-                            </div>
-                            <i class="icon icon-Star2"></i>
-                            <div class="marquee-child-item">
-                              HOT SALE 25% OFF
-                            </div>
-                            <i class="icon icon-Star2"></i>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                    <div class="card-product_info">
-                      <a
-                        href="product-detail.html"
-                        class="name-product lh-24 fw-medium link-underline-text"
-                      >
-                        Lyocell wrap top
-                      </a>
-                      <div class="star-wrap d-flex align-items-center">
-                        <i class="icon icon-Star"></i>
-                        <i class="icon icon-Star"></i>
-                        <i class="icon icon-Star"></i>
-                        <i class="icon icon-Star"></i>
-                        <i class="icon icon-Star"></i>
-                      </div>
-                      <div class="price-wrap">
-                        <span class="price-new text-primary fw-semibold">
-                          $69,99
-                        </span>
-                        <span class="price-old text-caption-01 cl-text-3">
-                          $99,99
-                        </span>
-                      </div>
-                      <ul class="product-color_list">
-                        <li class="product-color-item color-swatch hover-tooltip tooltip-bot active">
-                          <span class="tooltip color-filter">Brown</span>
-                          <span class="swatch-value bg-warm-beige"></span>
-                          <img
-                            src="/assets/images/product/product-1.jpg"
-                            data-src="/assets/images/product/product-1.jpg"
-                            alt="Image"
-                          />
-                        </li>
-                        <li class="product-color-item color-swatch hover-tooltip tooltip-bot">
-                          <span class="tooltip color-filter">Dark Blue</span>
-                          <span class="swatch-value bg-midnight-blue"></span>
-                          <img
-                            src="/assets/images/product/product-1_3.jpg"
-                            data-src="/assets/images/product/product-1_3.jpg"
-                            alt="Image"
-                          />
-                        </li>
-                        <li class="product-color-item color-swatch hover-tooltip tooltip-bot">
-                          <span class="tooltip color-filter">White</span>
-                          <span class="swatch-value bg-white"></span>
-                          <img
-                            src="/assets/images/product/product-1_4.jpg"
-                            data-src="/assets/images/product/product-1_4.jpg"
-                            alt="Image"
-                          />
-                        </li>
-                      </ul>
-                    </div>
-                  </div>
-                </div>
-                <div class="swiper-slide">
-                  <div class="card-product">
-                    <div class="card-product_wrapper">
-                      <a href="product-detail.html" class="product-img">
-                        <img
-                          class="img-product"
-                          loading="lazy"
-                          width="330"
-                          height="440"
-                          src="/assets/images/product/product-2.jpg"
-                          alt="Product"
-                        />
-                        <img
-                          class="img-hover"
-                          loading="lazy"
-                          width="330"
-                          height="440"
-                          src="/assets/images/product/product-2_2.jpg"
-                          alt="Product"
-                        />
-                      </a>
-                      <ul class="product-action_list">
-                        <li class="wishlist">
-                          <a
-                            href="#;"
-                            class="hover-tooltip tooltip-left box-icon"
-                          >
-                            <span class="icon icon-heart"></span>
-                            <span class="tooltip">Add to Wishlist</span>
-                          </a>
-                        </li>
-                        <li class="compare">
-                          <a
-                            href="#compare"
-                            data-bs-toggle="offcanvas"
-                            class="hover-tooltip tooltip-left box-icon"
-                          >
-                            <span class="icon icon-ArrowsLeftRight"></span>
-                            <span class="tooltip">Compare</span>
-                          </a>
-                        </li>
-                        <li>
-                          <a
-                            href="#quickView"
-                            data-bs-toggle="offcanvas"
-                            class="hover-tooltip tooltip-left box-icon"
-                          >
-                            <span class="icon icon-Eye"></span>
-                            <span class="tooltip">Quick view</span>
-                          </a>
-                        </li>
-                      </ul>
-                      <ul class="product-badge_list">
-                        <li class="product-badge_item text-caption-01 sale">
-                          -25%
-                        </li>
-                      </ul>
-                      <div class="product-action_bot">
-                        <a
-                          href="#quickAdd"
-                          data-bs-toggle="modal"
-                          class="tf-btn btn-white small  w-100"
-                        >
-                          Quick Add
-                        </a>
-                      </div>
-                    </div>
-                    <div class="card-product_info">
-                      <a
-                        href="product-detail.html"
-                        class="name-product lh-24 fw-medium link-underline-text"
-                      >
-                        Buttons cotton top
-                      </a>
-                      <div class="star-wrap d-flex align-items-center">
-                        <i class="icon icon-Star"></i>
-                        <i class="icon icon-Star"></i>
-                        <i class="icon icon-Star"></i>
-                        <i class="icon icon-Star"></i>
-                        <i class="icon icon-Star"></i>
-                      </div>
-                      <div class="price-wrap">
-                        <span class="price-new text-primary fw-semibold">
-                          $29,99
-                        </span>
-                        <span class="price-old text-caption-01 cl-text-3">
-                          $49,99
-                        </span>
-                      </div>
-                      <ul class="product-color_list">
-                        <li class="product-color-item color-swatch hover-tooltip tooltip-bot active">
-                          <span class="tooltip color-filter">Brown</span>
-                          <span class="swatch-value bg-warm-brown"></span>
-                          <img
-                            src="/assets/images/product/product-2.jpg"
-                            data-src="/assets/images/product/product-2.jpg"
-                            alt="Image"
-                          />
-                        </li>
-                        <li class="product-color-item color-swatch hover-tooltip tooltip-bot">
-                          <span class="tooltip color-filter">Beige</span>
-                          <span class="swatch-value bg-beige"></span>
-                          <img
-                            src="/assets/images/product/product-2_3.jpg"
-                            data-src="/assets/images/product/product-2_3.jpg"
-                            alt="Image"
-                          />
-                        </li>
-                      </ul>
-                    </div>
-                  </div>
-                </div>
+                  );
+                })}
               </div>
               <div class="sw-line-default style-2 tf-sw-pagination"></div>
             </div>

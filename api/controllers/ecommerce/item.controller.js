@@ -544,3 +544,45 @@ export const getPublicItemBySlugOrId = async (req, res) => {
     });
   }
 };
+
+export const getRelatedItems = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const isValidId = isValidObjectId(id);
+    const query = isValidId ? { _id: id } : { slug: id };
+    const currentItem = await Item.findOne({ ...query, deletedAt: null });
+
+    if (!currentItem) {
+      return res.status(404).json({
+        status: "error",
+        message: "Item not found",
+      });
+    }
+
+    const categories = currentItem.categories || [];
+
+    const relatedQuery = {
+      _id: { $ne: currentItem._id },
+      categories: { $in: categories },
+      deletedAt: null,
+    };
+
+    const options = generateOptions(req);
+    const response = await Item.paginate(relatedQuery, {
+      ...options,
+      sort: { createdAt: -1 },
+    });
+
+    return res.status(200).json({
+      status: "success",
+      message: "fetch related items successfully",
+      data: response,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      status: "error",
+      message: "Internal server error",
+      error: error.message,
+    });
+  }
+};

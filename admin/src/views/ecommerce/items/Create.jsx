@@ -236,20 +236,26 @@ function Create() {
   const handleVariantGalleryUpload = async (files, index) => {
     const formData = new FormData();
     files?.forEach((file) => formData.append("gallery", file?.file));
+
     const response = await basicProvider.postMethod(
       "cms/files/create",
       formData,
     );
+
     if (response.status === "success") {
-      const uploadedIds = response?.data?.gallery?.map((f) => f?._id);
+      const uploadedFiles = response?.data?.gallery || [];
+
       setInitialValues((prev) => {
         const updated = [...prev.varients];
+
         updated[index].gallery = [
           ...(updated[index].gallery || []),
-          ...uploadedIds,
+          ...uploadedFiles,
         ];
+
         return { ...prev, varients: updated };
       });
+
       setShowGalleryModal(false);
     }
   };
@@ -415,12 +421,14 @@ function Create() {
                               }}
                             >
                               <img
-                                src="/no-photos.png"
+                                src={
+                                  varient.gallery?.[0]?.url || "/no-photos.png"
+                                }
                                 width={40}
                                 alt="upload"
                               />
                               <span className="text-xs">
-                                ({varient.gallery?.length})
+                                ({varient.gallery?.length || 0})
                               </span>
                             </button>
                           </td>
@@ -640,8 +648,7 @@ function Create() {
           )}
         </div>
       </div>
-
-      {showGalleryModal && (
+      {showGalleryModal && selectedVariantIndex !== null && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-[999]">
           <div className="bg-white rounded-2xl p-6 w-[60%] max-h-[90vh] overflow-y-auto relative">
             <button
@@ -650,13 +657,15 @@ function Create() {
             >
               ✕
             </button>
+
             <h2 className="text-lg font-bold mb-4">
               Upload Images for:{" "}
               {initialValues.varients[selectedVariantIndex]?.name}
             </h2>
+
             <VarientFileUploadModule
               initialValues={
-                initialValues.varients[selectedVariantIndex]?.gallery
+                initialValues.varients[selectedVariantIndex]?.gallery || []
               }
               setInitialValues={(f) =>
                 handleVariantGalleryUpload(f, selectedVariantIndex)

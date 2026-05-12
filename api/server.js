@@ -31,6 +31,7 @@ import PublicConfigurationRouter from "./routers/configuration/frontend.setting.
 app.use(useragent.express());
 app.set("trust proxy", true);
 app.use(bodyParser.json());
+app.use(express.json({ limit: "50mb" }));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
 

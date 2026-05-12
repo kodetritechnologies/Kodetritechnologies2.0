@@ -1,6 +1,7 @@
 import { priceHelper, productUrl } from "@/utils/helpers/productHelper";
 import { serviceProvider } from "@/utils/serviceProvider";
 import Link from "next/link";
+import QuickViewButton from "@/components/QuickViewButton";
 
 async function TopTrending() {
   const serverProvider = await serviceProvider();
@@ -112,14 +113,7 @@ async function TopTrending() {
                           </a>
                         </li>
                         <li>
-                          <a
-                            href="#quickView"
-                            data-bs-toggle="offcanvas"
-                            className="hover-tooltip tooltip-left box-icon"
-                          >
-                            <span className="icon icon-Eye"></span>
-                            <span className="tooltip">Quick view</span>
-                          </a>
+                          <QuickViewButton product={product} />
                         </li>
                       </ul>
                       <ul className="product-badge_list">

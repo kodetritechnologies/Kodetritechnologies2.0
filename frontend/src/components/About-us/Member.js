@@ -1,4 +1,24 @@
-function Member() {
+import { serviceProvider } from "@/utils/serviceProvider";
+
+async function Member() {
+  const serverProvider = await serviceProvider();
+
+  const fetchMembers = async () => {
+    try {
+      const response = await serverProvider.getMethod(
+        "public/cms/testimonial/type/about",
+      );
+      return response?.data?.data || [];
+    } catch (error) {
+      console.error(error);
+      return [];
+    }
+  };
+
+  const members = await fetchMembers();
+
+  if (!members || members.length === 0) return null;
+
   return (
     <section className="flat-spacing pt-0">
       <div className="container">
@@ -24,186 +44,56 @@ function Member() {
           data-pagination-lg="4"
         >
           <div className="swiper-wrapper">
-            <div className="swiper-slide">
-              <div className="card-member-v01 hover-img">
-                <div className="member-image">
-                  <div className="image img-style">
-                    <img
-                      loading="lazy"
-                      width="330"
-                      height="440"
-                      src="/assets/images/member/member-1.jpg"
-                      alt="Image"
-                    />
+            {members.map((member, index) => (
+              <div className="swiper-slide" key={index}>
+                <div className="card-member-v01 hover-img">
+                  <div className="member-image">
+                    <div className="image img-style">
+                      <img
+                        loading="lazy"
+                        width="330"
+                        height="440"
+                        src={
+                          member?.featured_image?.url ||
+                          "/assets/images/member/member-1.jpg"
+                        }
+                        alt={member?.name || "Image"}
+                      />
+                    </div>
+                    <div className="social-wrap">
+                      <ul className="tf-social-icon-2 style-2 d-grid">
+                        <li>
+                          <a href="https://www.facebook.com/">
+                            <i className="icon icon-FacebookLogo"></i>
+                          </a>
+                        </li>
+                        <li>
+                          <a href="https://x.com/">
+                            <i className="icon icon-XLogo"></i>
+                          </a>
+                        </li>
+                        <li>
+                          <a href="https://www.instagram.com/">
+                            <i className="icon icon-InstagramLogo"></i>
+                          </a>
+                        </li>
+                        <li>
+                          <a href="https://www.tiktok.com/">
+                            <i className="icon icon-TiktokLogo"></i>
+                          </a>
+                        </li>
+                      </ul>
+                    </div>
                   </div>
-                  <div className="social-wrap">
-                    <ul className="tf-social-icon-2 style-2 d-grid">
-                      <li>
-                        <a href="https://www.facebook.com/">
-                          <i className="icon icon-FacebookLogo"></i>
-                        </a>
-                      </li>
-                      <li>
-                        <a href="https://x.com/">
-                          <i className="icon icon-XLogo"></i>
-                        </a>
-                      </li>
-                      <li>
-                        <a href="https://www.instagram.com/">
-                          <i className="icon icon-InstagramLogo"></i>
-                        </a>
-                      </li>
-                      <li>
-                        <a href="https://www.tiktok.com/">
-                          <i className="icon icon-TiktokLogo"></i>
-                        </a>
-                      </li>
-                    </ul>
+                  <div className="member-info">
+                    <a href="#" className="name h5 fw-medium link-underline link">
+                      {member?.name || "Member Name"}
+                    </a>
+                    <p className="duty cl-text-2">{member?.title || member?.description || "Manager"}</p>
                   </div>
-                </div>
-                <div className="member-info">
-                  <a href="#" className="name h5 fw-medium link-underline link">
-                    Annette Black
-                  </a>
-                  <p className="duty cl-text-2">Founder/CEO</p>
                 </div>
               </div>
-            </div>
-            <div className="swiper-slide">
-              <div className="card-member-v01 hover-img">
-                <div className="member-image">
-                  <div className="image img-style">
-                    <img
-                      loading="lazy"
-                      width="330"
-                      height="440"
-                      src="/assets/images/member/member-2.jpg"
-                      alt="Image"
-                    />
-                  </div>
-                  <div className="social-wrap">
-                    <ul className="tf-social-icon-2 style-2 d-grid">
-                      <li>
-                        <a href="https://www.facebook.com/">
-                          <i className="icon icon-FacebookLogo"></i>
-                        </a>
-                      </li>
-                      <li>
-                        <a href="https://x.com/">
-                          <i className="icon icon-XLogo"></i>
-                        </a>
-                      </li>
-                      <li>
-                        <a href="https://www.instagram.com/">
-                          <i className="icon icon-InstagramLogo"></i>
-                        </a>
-                      </li>
-                      <li>
-                        <a href="https://www.tiktok.com/">
-                          <i className="icon icon-TiktokLogo"></i>
-                        </a>
-                      </li>
-                    </ul>
-                  </div>
-                </div>
-                <div className="member-info">
-                  <a href="#" className="name h5 fw-medium link-underline link">
-                    Brooklyn Simmons
-                  </a>
-                  <p className="duty cl-text-2">Manager</p>
-                </div>
-              </div>
-            </div>
-            <div className="swiper-slide">
-              <div className="card-member-v01 hover-img">
-                <div className="member-image">
-                  <div className="image img-style">
-                    <img
-                      loading="lazy"
-                      width="330"
-                      height="440"
-                      src="/assets/images/member/member-3.jpg"
-                      alt="Image"
-                    />
-                  </div>
-                  <div className="social-wrap">
-                    <ul className="tf-social-icon-2 style-2 d-grid">
-                      <li>
-                        <a href="https://www.facebook.com/">
-                          <i className="icon icon-FacebookLogo"></i>
-                        </a>
-                      </li>
-                      <li>
-                        <a href="https://x.com/">
-                          <i className="icon icon-XLogo"></i>
-                        </a>
-                      </li>
-                      <li>
-                        <a href="https://www.instagram.com/">
-                          <i className="icon icon-InstagramLogo"></i>
-                        </a>
-                      </li>
-                      <li>
-                        <a href="https://www.tiktok.com/">
-                          <i className="icon icon-TiktokLogo"></i>
-                        </a>
-                      </li>
-                    </ul>
-                  </div>
-                </div>
-                <div className="member-info">
-                  <a href="#" className="name h5 fw-medium link-underline link">
-                    Jane Cooper
-                  </a>
-                  <p className="duty cl-text-2">Sales Director</p>
-                </div>
-              </div>
-            </div>
-            <div className="swiper-slide">
-              <div className="card-member-v01 hover-img">
-                <div className="member-image">
-                  <div className="image img-style">
-                    <img
-                      loading="lazy"
-                      width="330"
-                      height="440"
-                      src="/assets/images/member/member-4.jpg"
-                      alt="Image"
-                    />
-                  </div>
-                  <div className="social-wrap">
-                    <ul className="tf-social-icon-2 style-2 d-grid">
-                      <li>
-                        <a href="https://www.facebook.com/">
-                          <i className="icon icon-FacebookLogo"></i>
-                        </a>
-                      </li>
-                      <li>
-                        <a href="https://x.com/">
-                          <i className="icon icon-XLogo"></i>
-                        </a>
-                      </li>
-                      <li>
-                        <a href="https://www.instagram.com/">
-                          <i className="icon icon-InstagramLogo"></i>
-                        </a>
-                      </li>
-                      <li>
-                        <a href="https://www.tiktok.com/">
-                          <i className="icon icon-TiktokLogo"></i>
-                        </a>
-                      </li>
-                    </ul>
-                  </div>
-                </div>
-                <div className="member-info">
-                  <a href="#" className="name h5 fw-medium link-underline link">
-                    Lisa Bonet
-                  </a>
-                  <p className="duty cl-text-2">Sales Director</p>
-                </div>
-              </div>
-            </div>
+            ))}
           </div>
           <div className="sw-line-default style-2 tf-sw-pagination"></div>
         </div>

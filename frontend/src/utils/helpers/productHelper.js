@@ -14,8 +14,8 @@ export function priceHelper(product) {
 
 export function productUrl(product) {
   if (product?.type == "simple") {
-    return `/${product?.slug}` || "";
+    return `/shop/${product?.slug}` || "";
   } else {
-    return `/${product?.slug}/${product?.varients[0]?.slug}` || "";
+    return `/shop/${product?.slug}/${product?.varients[0]?.slug}` || "";
   }
 }
