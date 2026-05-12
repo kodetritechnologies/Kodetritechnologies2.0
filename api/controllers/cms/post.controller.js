@@ -8,15 +8,12 @@ import {
 import { slugGenerator } from "../../helpers/slugGenerator.js";
 import Post from "../../models/cms/post.schema.js";
 import File from "../../models/file.schema.js";
+import Categories from "../../models/configuration/master/categories.schema.js";
+import Tages from "../../models/configuration/master/tages.schema.js";
 
 export const getPost = async (req, res) => {
   try {
-    const { _id } = req.admin;
-    const query = GenerateSearchQuery(req, {
-      admin: _id,
-
-      deletedAt: null,
-    });
+    const query = GenerateSearchQuery(req, { deletedAt: null });
     const options = generateOptions(req);
     const post = await Post.paginate(query, options);
 
@@ -36,9 +33,9 @@ export const getPost = async (req, res) => {
 
 export const getTrashPost = async (req, res) => {
   try {
-    const { _id } = req.admin;
+
     const query = GenerateSearchQuery(req, {
-      admin: _id,
+
 
       deletedAt: { $ne: null },
     });
@@ -61,9 +58,9 @@ export const getTrashPost = async (req, res) => {
 
 export const getPostById = async (req, res) => {
   try {
-    const { _id } = req.admin;
+
     const { id } = req.params;
-    const query = { _id: id, admin: _id, deletedAt: null };
+    const query = { _id: id, deletedAt: null };
 
     const Posts = await Post.findOne(query);
 
@@ -83,7 +80,7 @@ export const getPostById = async (req, res) => {
 
 export const createPost = async (req, res) => {
   try {
-    const { _id } = req.admin;
+
     const data = req.body;
     const { featured_image } = await fileUploads(req);
     const slug = await slugGenerator(data.title, Post);
@@ -91,7 +88,7 @@ export const createPost = async (req, res) => {
     const payload = {
       ...data,
       slug,
-      admin: _id,
+
 
       featured_image: featured_image?._id || null,
     };
@@ -113,11 +110,11 @@ export const createPost = async (req, res) => {
 
 export const updatePost = async (req, res) => {
   try {
-    const { _id } = req.admin;
+
     const { id } = req.params;
     const query = {
       _id: id,
-      admin: _id,
+
     };
 
     let isExistPost = await Post.findOne({ _id: id });
@@ -156,8 +153,8 @@ export const updatePost = async (req, res) => {
 export const deletePost = async (req, res) => {
   try {
     const { id } = req.params;
-    const { _id } = req.admin;
-    const query = { _id: id, admin: _id, deletedAt: { $ne: null } };
+
+    const query = { _id: id, deletedAt: { $ne: null } };
     const deletePost = await Post.deleteOne(query);
 
     if (!deletePost) {
@@ -183,8 +180,8 @@ export const deletePost = async (req, res) => {
 export const trashPost = async (req, res) => {
   try {
     const { id } = req.params;
-    const { _id } = req.admin;
-    const query = { _id: id, admin: _id, deletedAt: null };
+
+    const query = { _id: id, deletedAt: null };
     const deletePost = await Post.findOne(query);
 
     if (!deletePost) {
@@ -217,10 +214,10 @@ export const trashPost = async (req, res) => {
 
 export const multiDeletePost = async (req, res) => {
   try {
-    const { _id } = req.admin;
+
     const ids = req.body;
     const query = {
-      admin: _id,
+
 
       deletedAt: { $ne: null },
       _id: { $in: ids },
@@ -251,10 +248,10 @@ export const multiDeletePost = async (req, res) => {
 
 export const multiTrashPost = async (req, res) => {
   try {
-    const { _id } = req.admin;
+
     const ids = req.body;
     const query = {
-      admin: _id,
+
 
       deletedAt: null,
       _id: { $in: ids },
@@ -288,8 +285,8 @@ export const multiTrashPost = async (req, res) => {
 export const restoreTrashPost = async (req, res) => {
   try {
     const { id } = req.params;
-    const { _id } = req.admin;
-    const query = { _id: id, admin: _id, deletedAt: { $ne: null } };
+
+    const query = { _id: id, deletedAt: { $ne: null } };
     const Posts = await Post.findOne(query);
     if (!Posts) {
       return res.status(404).json({
@@ -318,7 +315,30 @@ export const restoreTrashPost = async (req, res) => {
 export const getPostsByType = async (req, res) => {
   try {
     const { type } = req.params;
-    const query = { type: type, deletedAt: null };
+    const { category, tag, search } = req.query;
+    let query = { type: type, deletedAt: null };
+
+    if (search) {
+      query = GenerateSearchQuery(req, query);
+    }
+
+    if (category) {
+      const categoryDoc = await Categories.findOne({
+        slug: category,
+        deletedAt: null,
+      });
+      if (categoryDoc) {
+        query.categories = categoryDoc._id;
+      }
+    }
+
+    if (tag) {
+      const tagDoc = await Tages.findOne({ slug: tag, deletedAt: null });
+      if (tagDoc) {
+        query.tags = tagDoc._id;
+      }
+    }
+
     const options = generateOptions(req);
     const posts = await Post.paginate(query, options);
     return res.status(200).json({
@@ -344,6 +364,85 @@ export const getPostsBySlug = async (req, res) => {
       status: "success",
       message: "fetch post successfully",
       data: post,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      status: "error",
+      message: "Internal server error",
+      error: error.message,
+    });
+  }
+};
+
+export const getRecentPostsByType = async (req, res) => {
+  try {
+    const { type } = req.params;
+    const query = { type: type, deletedAt: null };
+
+    const options = {
+      ...generateOptions(req),
+      sort: { publish_date: -1, createdAt: -1 },
+    };
+
+    const posts = await Post.paginate(query, options);
+
+    return res.status(200).json({
+      status: "success",
+      message: "fetch recent posts successfully",
+      data: posts,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      status: "error",
+      message: "Internal server error",
+      error: error.message,
+    });
+  }
+};
+
+export const getRelatedPosts = async (req, res) => {
+  try {
+    const { slug } = req.params;
+    const { count = 3 } = req.query;
+
+    const currentPost = await Post.findOne({ slug: slug, deletedAt: null });
+    if (!currentPost) {
+      return res.status(404).json({
+        status: "error",
+        message: "Post not found",
+      });
+    }
+
+    let query = {
+      _id: { $ne: currentPost._id },
+      type: currentPost.type,
+      deletedAt: null,
+    };
+
+    if (
+      (currentPost.categories && currentPost.categories.length > 0) ||
+      (currentPost.tags && currentPost.tags.length > 0)
+    ) {
+      query.$or = [];
+      if (currentPost.categories && currentPost.categories.length > 0) {
+        query.$or.push({ categories: { $in: currentPost.categories } });
+      }
+      if (currentPost.tags && currentPost.tags.length > 0) {
+        query.$or.push({ tags: { $in: currentPost.tags } });
+      }
+    }
+
+    const options = {
+      ...generateOptions(req),
+      limit: parseInt(count),
+      sort: { publish_date: -1, createdAt: -1 },
+    };
+
+    const posts = await Post.paginate(query, options);
+    return res.status(200).json({
+      status: "success",
+      message: "fetch related posts successfully",
+      data: posts,
     });
   } catch (error) {
     return res.status(500).json({

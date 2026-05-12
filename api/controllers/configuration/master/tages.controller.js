@@ -9,10 +9,7 @@ import { fileUploads } from "../../../helpers/fileUploads.js";
 import File from "../../../models/file.schema.js";
 export const getTages = async (req, res) => {
   try {
-    const { _id,  } = req.admin;
     const query = GenerateSearchQuery(req, {
-      admin: _id,
-
       deletedAt: null,
     });
 
@@ -21,7 +18,6 @@ export const getTages = async (req, res) => {
     const TagesType = await Tages.aggregate([
       {
         $match: {
-          admin: new mongoose.Types.ObjectId(_id),
           deletedAt: null,
         },
       },
@@ -51,7 +47,7 @@ export const getTages = async (req, res) => {
 export const getTagesById = async (req, res) => {
   try {
     const { id } = req.params;
-    const { _id,  } = req.admin;
+    const { _id, } = req.admin;
     const query = { _id: id, admin: _id, deletedAt: null };
 
     const getTages = await Tages.findOne(query);
@@ -63,7 +59,7 @@ export const getTagesById = async (req, res) => {
     }
 
     return res.status(200).json({
-      ststus: "success",
+      status: "success",
       message: "Tages fetched successfully",
       data: getTages,
     });
@@ -79,13 +75,10 @@ export const getTagesById = async (req, res) => {
 export const getTagesByType = async (req, res) => {
   try {
     const { type } = req.params;
-    const { _id,  } = req.admin;
-    const tagesType = await Status.find({
+    const tagesType = await Tages.find({
       type,
-      admin: _id,
-
       deletedAt: null,
-    });
+    }).populate("featured_image", "_id name")
 
     if (!tagesType || tagesType.length === 0) {
       return res.status(404).json({
@@ -111,7 +104,7 @@ export const getTagesByType = async (req, res) => {
 export const createTages = async (req, res) => {
   try {
     const { name, type } = req.body;
-    const { _id,  } = req.admin;
+    const { _id, } = req.admin;
 
     const { featured_image } = await fileUploads(req);
 
@@ -183,7 +176,7 @@ export const updateTages = async (req, res) => {
 export const deleteTages = async (req, res) => {
   try {
     const { id } = req.params;
-    const { _id,  } = req.admin;
+    const { _id, } = req.admin;
     const query = { _id: id, admin: _id, deletedAt: null };
     const deletedTages = await Tages.deleteOne(query);
 
@@ -209,7 +202,7 @@ export const deleteTages = async (req, res) => {
 
 export const multiDeleteTages = async (req, res) => {
   try {
-    const { _id,  } = req.admin;
+    const { _id, } = req.admin;
     const ids = req.body;
     const query = {
       admin: _id,

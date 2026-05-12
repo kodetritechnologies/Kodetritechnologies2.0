@@ -4,10 +4,12 @@ import { getBrandsFrontend } from "../../controllers/configuration/master/brands
 import { getFooterSettingByType } from "../../controllers/configuration/setting/footer.controller.js";
 import { getRegionsPublicByType } from "../../controllers/configuration/master/regions.controller.js";
 import { getCategoryByType } from "../../controllers/configuration/master/categories.controller.js";
+import { getTagesByType } from "../../controllers/configuration/master/tages.controller.js";
 
 router.get("/brands/all", getBrandsFrontend);
 router.get("/footerSetting/:type", getFooterSettingByType);
 router.get("/regions/:type", getRegionsPublicByType);
 router.get("/categories/:type", getCategoryByType);
+router.get("/tages/:type", getTagesByType);
 
 export default router;

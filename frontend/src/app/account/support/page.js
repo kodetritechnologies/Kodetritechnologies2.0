@@ -8,6 +8,7 @@ import Link from "next/link";
 import Pagination from "@/components/Pagination";
 import { useSearchParams } from "next/navigation";
 import swalHelper from "@/utils/swalHelper";
+import { formatDate } from "@/utils/helpers/dateHelper";
 
 
 function SupportPage() {
@@ -262,7 +263,7 @@ function SupportPage() {
                                                         <td className="px-4 py-3 text-center">{getPriorityBadge(ticket.priority)}</td>
                                                         <td className="px-4 py-3 text-center">{getStatusBadge(ticket.status)}</td>
                                                         <td className="px-4 py-3 small text-muted">
-                                                            {new Date(ticket.createdAt).toLocaleDateString()}
+                                                            {formatDate(ticket.createdAt)}
                                                             <div className="smaller mt-1">{new Date(ticket.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
                                                         </td>
                                                         <td className="px-4 py-3 text-end">

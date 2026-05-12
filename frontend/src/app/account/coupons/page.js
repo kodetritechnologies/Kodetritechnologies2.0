@@ -2,6 +2,7 @@
 import BasicProvider from "@/utils/BasicProvider";
 import { useEffect, useState } from "react";
 import { toast } from "react-hot-toast";
+import { formatDate } from "@/utils/helpers/dateHelper";
 
 function Page() {
     const basicProvider = BasicProvider();
@@ -186,7 +187,7 @@ function CouponCard({ coupon, isClaimed, onClaim, onCopy }) {
                         <div className="mt-3 pt-3 border-top d-flex justify-content-between align-items-center">
                             <div className="small text-secondary fw-medium">
                                 <i className="fa-regular fa-clock me-1"></i>
-                                {new Date(coupon.end_date).toLocaleDateString()}
+                                {formatDate(coupon.end_date)}
                             </div>
                             
                             {isOriginalClaimed(isClaimed) ? (

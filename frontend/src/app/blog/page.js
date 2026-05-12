@@ -1,4 +1,79 @@
-function page() {
+import { serviceProvider } from "@/utils/serviceProvider";
+import { formatDate } from "@/utils/helpers/dateHelper";
+import Link from "next/link";
+import Pagination from "@/components/Pagination";
+
+async function page({ searchParams }) {
+  const resolvedParams = await searchParams;
+  const page = resolvedParams?.page || 1;
+  const search = resolvedParams?.search || "";
+  const category = resolvedParams?.category || "";
+  const tag = resolvedParams?.tag || "";
+
+  const serverProvider = await serviceProvider();
+
+  const fetchCategories = async () => {
+    try {
+      const response = await serverProvider.getMethod(
+        "public/configuration/categories/blog"
+      );
+      return response?.data || [];
+    } catch (error) {
+      console.error(error);
+      return [];
+    }
+  };
+
+  const fetchTags = async () => {
+    try {
+      const response = await serverProvider.getMethod(
+        "public/configuration/tages/blog"
+      );
+      return response?.data || [];
+    } catch (error) {
+      console.error(error);
+      return [];
+    }
+  };
+
+  const fetchBlogs = async (pageNumber, search, category, tag) => {
+    try {
+      let query = `?page=${pageNumber}`;
+      if (search) query += `&search=${encodeURIComponent(search)}`;
+      if (category) query += `&category=${encodeURIComponent(category)}`;
+      if (tag) query += `&tag=${encodeURIComponent(tag)}`;
+
+      const response = await serverProvider.getMethod(
+        `public/cms/posts/type/blog${query}`
+      );
+      return response?.data || {};
+    } catch (error) {
+      console.error(error);
+      return {};
+    }
+  };
+
+  const fetchRecentBlogs = async () => {
+    try {
+      const response = await serverProvider.getMethod(
+        "public/cms/posts/recent/blog?count=4"
+      );
+      return response?.data?.data || [];
+    } catch (error) {
+      console.error(error);
+      return [];
+    }
+  };
+
+  const [categories, tags, blogsData, recentBlogs] = await Promise.all([
+    fetchCategories(),
+    fetchTags(),
+    fetchBlogs(page, search, category, tag),
+    fetchRecentBlogs(),
+  ]);
+
+  const blogs = blogsData?.data || [];
+
   return (
     <main id="wrapper">
       <section className="section-blog flat-spacing">
@@ -8,199 +83,50 @@ function page() {
           <div className="row">
             <div className="col-lg-8">
               <div className="tf-grid-layout sm-col-2">
-                <article className="article-blog hover-img">
-                  <a href="blog-single.html" className="blog-image img-style">
-                    <img
-                      loading="lazy"
-                      width="450"
-                      height="307"
-                      src="/assets/images/blog/blog-1.jpg"
-                      alt="Image"
-                    />
-                  </a>
-                  <div className="blog-content">
-                    <p className="entry-date text-caption-01 fw-semibold cl-text-3">
-                      13 August
-                    </p>
-                    <h5 className="entry-title">
-                      <a
-                        href="blog-single.html"
-                        className="link-underline link"
-                      >
-                        How to Build a Capsule Wardrobe That Fits Your Lifestyle
-                      </a>
-                    </h5>
-                    <p className="entry-desc cl-text-2">
-                      Learn the art of mixing timeless basics with statement
-                      pieces for effortless, everyday style.
-                    </p>
-                  </div>
-                </article>
-                <article className="article-blog hover-img">
-                  <a href="blog-single.html" className="blog-image img-style">
-                    <img
-                      loading="lazy"
-                      width="450"
-                      height="307"
-                      src="/assets/images/blog/blog-2.jpg"
-                      alt="Image"
-                    />
-                  </a>
-                  <div className="blog-content">
-                    <p className="entry-date text-caption-01 fw-semibold cl-text-3">
-                      15 August
-                    </p>
-                    <h5 className="entry-title">
-                      <a
-                        href="blog-single.html"
-                        className="link-underline link"
-                      >
-                        The Secret to Effortless Elegance in Every Season
-                      </a>
-                    </h5>
-                    <p className="entry-desc cl-text-2">
-                      Discover key layering techniques and fabric choices that
-                      keep you chic year-round.
-                    </p>
-                  </div>
-                </article>
-                <article className="article-blog hover-img">
-                  <a href="blog-single.html" className="blog-image img-style">
-                    <img
-                      loading="lazy"
-                      width="450"
-                      height="307"
-                      src="/assets/images/blog/blog-3.jpg"
-                      alt="Image"
-                    />
-                  </a>
-                  <div className="blog-content">
-                    <p className="entry-date text-caption-01 fw-semibold cl-text-3">
-                      18 August
-                    </p>
-                    <h5 className="entry-title">
-                      <a
-                        href="blog-single.html"
-                        className="link-underline link"
-                      >
-                        Why Accessories Define More Than Just Your Outfit
-                      </a>
-                    </h5>
-                    <p className="entry-desc cl-text-2">
-                      Explore how small details like jewelry and bags can
-                      transform your entire look.
-                    </p>
-                  </div>
-                </article>
-                <article className="article-blog hover-img">
-                  <a href="blog-single.html" className="blog-image img-style">
-                    <img
-                      loading="lazy"
-                      width="450"
-                      height="307"
-                      src="/assets/images/blog/blog-4.jpg"
-                      alt="Image"
-                    />
-                  </a>
-                  <div className="blog-content">
-                    <p className="entry-date text-caption-01 fw-semibold cl-text-3">
-                      19 August
-                    </p>
-                    <h5 className="entry-title">
-                      <a
-                        href="blog-single.html"
-                        className="link-underline link"
-                      >
-                        From Work to Weekend: Outfits That Do It All
-                      </a>
-                    </h5>
-                    <p className="entry-desc cl-text-2">
-                      Find versatile looks that transition seamlessly from
-                      office hours to after-hours fun.
-                    </p>
-                  </div>
-                </article>
-                <article className="article-blog hover-img">
-                  <a href="blog-single.html" className="blog-image img-style">
-                    <img
-                      loading="lazy"
-                      width="450"
-                      height="307"
-                      src="/assets/images/blog/blog-5.jpg"
-                      alt="Image"
-                    />
-                  </a>
-                  <div className="blog-content">
-                    <p className="entry-date text-caption-01 fw-semibold cl-text-3">
-                      22 August
-                    </p>
-                    <h5 className="entry-title">
-                      <a
-                        href="blog-single.html"
-                        className="link-underline link"
-                      >
-                        Mastering Color Palettes for a Modern Wardrobe
-                      </a>
-                    </h5>
-                    <p className="entry-desc cl-text-2">
-                      Understand how to blend tones and textures to express your
-                      personality through fashion.
-                    </p>
-                  </div>
-                </article>
-                <article className="article-blog hover-img">
-                  <a href="blog-single.html" className="blog-image img-style">
-                    <img
-                      loading="lazy"
-                      width="450"
-                      height="307"
-                      src="/assets/images/blog/blog-6.jpg"
-                      alt="Image"
-                    />
-                  </a>
-                  <div className="blog-content">
-                    <p className="entry-date text-caption-01 fw-semibold cl-text-3">
-                      24 August
-                    </p>
-                    <h5 className="entry-title">
-                      <a
-                        href="blog-single.html"
-                        className="link-underline link"
-                      >
-                        Sustainable Fashion Choices That Never Go Out of Style
-                      </a>
-                    </h5>
-                    <p className="entry-desc cl-text-2">
-                      Learn how to shop smarter with eco-friendly pieces that
-                      look good and do good.
-                    </p>
-                  </div>
-                </article>
-                <div className="wd-full">
-                  <div className="tf-page-pagination">
-                    <a href="#" className="pag-item">
-                      1
-                    </a>
-                    <p className="pag-item active">2</p>
-                    <a href="#" className="pag-item">
-                      3
-                    </a>
-                    <a href="#" className="pag-item">
-                      <i className="icon icon-CaretRightThin"></i>
-                    </a>
-                  </div>
-                </div>
+                {blogs.map((item) => (
+                  <article className="article-blog hover-img" key={item._id}>
+                    <Link href={`/blog/${item.slug}`} className="blog-image img-style">
+                      <img
+                        loading="lazy"
+                        width="450"
+                        height="307"
+                        src={item.featured_image?.url || "/assets/images/blog/fashion_blog_post.png"}
+                        alt={item.title}
+                      />
+                    </Link>
+                    <div className="blog-content">
+                      <p className="entry-date text-caption-01 fw-semibold cl-text-3">
+                        {formatDate(item.publish_date || item.createdAt, { includeYear: false, monthFormat: "long" })}
+                      </p>
+                      <h5 className="entry-title">
+                        <Link
+                          href={`/blog/${item.slug}`}
+                          className="link-underline link"
+                        >
+                          {item.title}
+                        </Link>
+                      </h5>
+                      <p className="entry-desc cl-text-2">
+                        {item.content ? (item.content.replace(/<[^>]*>?/gm, '').substring(0, 100) + '...') : ""}
+                      </p>
+                    </div>
+                  </article>
+                ))}
+                {blogs.length === 0 && <p>No blogs found.</p>}
               </div>
+              <Pagination data={blogsData} />
             </div>
             <div className="col-lg-4 d-none d-lg-block">
               <div className="blog-sidebar sidebar-content-wrap sticky-top">
                 <div className="sidebar-item">
                   <div className="sb-search">
-                    <form className="form-search-blog ">
+                    <form className="form-search-blog" method="GET" action="/blog">
                       <fieldset>
                         <input
                           className="style-stroke-bottom"
                           type="text"
+                          name="search"
+                          defaultValue={search}
                           placeholder="Search..."
                           required
                         />
@@ -209,194 +135,70 @@ function page() {
                         <i className="icon icon-MagnifyingGlass"></i>
                       </button>
                     </form>
+                    {(search || category || tag) && (
+                      <Link href="/blog" className="mt-2 d-block text-center text-primary">
+                        Clear All Filters
+                      </Link>
+                    )}
                   </div>
                 </div>
                 <div className="sidebar-item">
                   <h5 className="sb-title">Categories</h5>
                   <ul className="sb-category">
-                    <li>
-                      <a href="blog.html">
-                        Style Inspiration
-                        <span className="count">(112)</span>
-                      </a>
-                    </li>
-                    <li>
-                      <a href="blog.html">
-                        Fashion Tips
-                        <span className="count">(32)</span>
-                      </a>
-                    </li>
-                    <li>
-                      <a href="blog.html">
-                        Trends & News
-                        <span className="count">(42)</span>
-                      </a>
-                    </li>
-                    <li>
-                      <a href="blog.html">
-                        Outfit Guides
-                        <span className="count">(65)</span>
-                      </a>
-                    </li>
-                    <li>
-                      <a href="blog.html">
-                        Sustainable Living
-                        <span className="count">(13)</span>
-                      </a>
-                    </li>
+                    {categories.map((item) => (
+                      <li key={item._id}>
+                        <Link 
+                          href={`/blog?category=${item.slug}${search ? `&search=${search}` : ""}`}
+                          className={category === item.slug ? "active text-primary" : ""}
+                        >
+                          {item.name}
+                        </Link>
+                      </li>
+                    ))}
                   </ul>
                 </div>
                 <div className="sidebar-item">
                   <h5 className="sb-title">Recent Posts</h5>
                   <ul className="sb-recent">
-                    <li className="recent-item">
-                      <a href="blog-single.html" className="image">
-                        <img
-                          loading="lazy"
-                          width="90"
-                          height="90"
-                          src="/assets/images/blog/recent-1.jpg"
-                          alt="Image"
-                        />
-                      </a>
-                      <div className="meta">
-                        <p className="meta-date text-caption-01 cl-text-2">
-                          25 August
-                        </p>
-                        <a
-                          href="blog-single.html"
-                          className="meta-name link-underline link fw-medium"
-                        >
-                          Must-Have Wardrobe Staples for Every Season
-                        </a>
-                      </div>
-                    </li>
-                    <li className="recent-item">
-                      <a href="blog-single.html" className="image">
-                        <img
-                          loading="lazy"
-                          width="90"
-                          height="90"
-                          src="/assets/images/blog/recent-2.jpg"
-                          alt="Image"
-                        />
-                      </a>
-                      <div className="meta">
-                        <p className="meta-date text-caption-01 cl-text-2">
-                          27 August
-                        </p>
-                        <a
-                          href="blog-single.html"
-                          className="meta-name link-underline link fw-medium"
-                        >
-                          Essential Styling Rules Every Woman Should Know
-                        </a>
-                      </div>
-                    </li>
-                    <li className="recent-item">
-                      <a href="blog-single.html" className="image">
-                        <img
-                          loading="lazy"
-                          width="90"
-                          height="90"
-                          src="/assets/images/blog/recent-3.jpg"
-                          alt="Image"
-                        />
-                      </a>
-                      <div className="meta">
-                        <p className="meta-date text-caption-01 cl-text-2">
-                          26 August
-                        </p>
-                        <a
-                          href="blog-single.html"
-                          className="meta-name link-underline link fw-medium"
-                        >
-                          Top Streetwear Trends Dominating This Year
-                        </a>
-                      </div>
-                    </li>
-                    <li className="recent-item">
-                      <a href="blog-single.html" className="image">
-                        <img
-                          loading="lazy"
-                          width="90"
-                          height="90"
-                          src="/assets/images/blog/recent-4.jpg"
-                          alt="Image"
-                        />
-                      </a>
-                      <div className="meta">
-                        <p className="meta-date text-caption-01 cl-text-2">
-                          28 August
-                        </p>
-                        <a
-                          href="blog-single.html"
-                          className="meta-name link-underline link fw-medium"
-                        >
-                          Modern Accessories That Instantly Elevate Your Look
-                        </a>
-                      </div>
-                    </li>
+                    {recentBlogs.map((item) => (
+                      <li className="recent-item" key={item._id}>
+                        <Link href={`/blog/${item.slug}`} className="image">
+                          <img
+                            loading="lazy"
+                            width="90"
+                            height="90"
+                            src={item.featured_image?.url || "/assets/images/blog/recent_staples.png"}
+                            alt={item.title}
+                          />
+                        </Link>
+                        <div className="meta">
+                          <p className="meta-date text-caption-01 cl-text-2">
+                            {formatDate(item.publish_date || item.createdAt, { includeYear: false, monthFormat: "long" })}
+                          </p>
+                          <Link
+                            href={`/blog/${item.slug}`}
+                            className="meta-name link-underline link fw-medium"
+                          >
+                            {item.title}
+                          </Link>
+                        </div>
+                      </li>
+                    ))}
                   </ul>
                 </div>
                 <div className="sidebar-item">
                   <h5 className="sb-title">Popular Tag</h5>
                   <ul className="sb-tag">
-                    <li>
-                      <a href="blog.html" className="text-caption-01">
-                        fashion
-                      </a>
-                    </li>
-                    <li>
-                      <a href="blog.html" className="text-caption-01">
-                        style
-                      </a>
-                    </li>
-                    <li>
-                      <a href="blog.html" className="text-caption-01">
-                        outfit
-                      </a>
-                    </li>
-                    <li>
-                      <a href="blog.html" className="text-caption-01">
-                        trend
-                      </a>
-                    </li>
-                    <li>
-                      <a href="blog.html" className="text-caption-01">
-                        elegance
-                      </a>
-                    </li>
-                    <li>
-                      <a href="blog.html" className="text-caption-01">
-                        minimal
-                      </a>
-                    </li>
-                    <li>
-                      <a href="blog.html" className="text-caption-01">
-                        luxury
-                      </a>
-                    </li>
-                    <li>
-                      <a href="blog.html" className="text-caption-01">
-                        casual
-                      </a>
-                    </li>
-                    <li>
-                      <a href="blog.html" className="text-caption-01">
-                        accessories
-                      </a>
-                    </li>
-                    <li>
-                      <a href="blog.html" className="text-caption-01">
-                        sustainable
-                      </a>
-                    </li>
-                    <li>
-                      <a href="blog.html" className="text-caption-01">
-                        wardrobe
-                      </a>
-                    </li>
+                    {tags.map((item) => (
+                      <li key={item._id}>
+                        <Link 
+                          href={`/blog?tag=${item.slug}${search ? `&search=${search}` : ""}`}
+                          className={`text-caption-01 ${tag === item.slug ? "active text-primary" : ""}`}
+                        >
+                          {item.name}
+                        </Link>
+                      </li>
+                    ))}
                   </ul>
                 </div>
               </div>
@@ -409,3 +211,4 @@ function page() {
 }
 
 export default page;
+

@@ -30,11 +30,18 @@ const postsSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "File",
     },
-    admin: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Admin",
-      required: true,
-    },
+    categories: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Categories",
+      },
+    ],
+    tags: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Tages",
+      },
+    ],
     deletedAt: {
       type: Date,
       default: null,
@@ -46,10 +53,14 @@ const postsSchema = new mongoose.Schema(
 
 postsSchema.pre("find", function (next) {
   this.populate("featured_image");
+  this.populate("categories");
+  this.populate("tags");
   next();
 });
 postsSchema.pre("findOne", function (next) {
   this.populate("featured_image");
+  this.populate("categories");
+  this.populate("tags");
   next();
 });
 

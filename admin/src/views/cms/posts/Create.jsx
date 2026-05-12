@@ -8,13 +8,17 @@ import BasicProvider from "../../../authentications/BasicProvider";
 import { useEffect } from "react";
 import handleSubmitHelper from "../../../helpers/handleSubmitHelper";
 import toast from "react-hot-toast";
+import MultiSelectDropdown from "../../../components/MultiSelectDropdown";
+import JsTreeCheckbox from "../../../components/JsTreeCheckbox";
 
 function Create() {
   const { id } = useParams();
   const navigate = useNavigate();
   const basicProvider = BasicProvider();
   const [image, setImage] = useState(null);
+  const [categories, setCategories] = useState([]);
   const [types, setTypes] = useState([]);
+  const [defaultCategories, setDefaultCategories] = useState([]);
 
 
   const [initialValues, setInitialValues] = useState({
@@ -23,6 +27,8 @@ function Create() {
     content: "",
     featured: false,
     type: "post",
+    categories: [],
+    tags: [],
     publish_date: YYYYMMDD(new Date()),
     featured_image: null,
   });
@@ -37,20 +43,40 @@ function Create() {
 
   const fetchData = async () => {
     const response = await basicProvider.getMethod(`cms/post/by/${id}`);
-    setInitialValues(response.data);
+    setDefaultCategories(response.data?.categories || []);
+    setInitialValues({
+      ...response.data,
+      categories: response.data?.categories?.map((cat) => cat._id) || [],
+      tags: response.data?.tags?.map((tag) => ({
+        label: tag.name,
+        value: tag._id,
+      })) || [],
+    });
     setImage(response?.data?.featured_image);
+  };
+
+  const fetchCategories = async () => {
+    const response = await basicProvider.getMethod(
+      `configuration/categories/byType/post`
+    );
+    setCategories(response.data || []);
   };
 
   const fetchTypes = async () => {
     const response = await basicProvider.getMethod(
-      `configuration/categories/byType/posts`
+      `configuration/categories/byType/post`
     );
     setTypes(response.data || []);
   };
 
   const handleSubmit = async () => {
     let response = "";
-    const data = handleSubmitHelper(initialValues);
+    const payload = {
+      ...initialValues,
+      categories: initialValues.categories.map((cat) => cat.id || cat),
+      tags: initialValues.tags.map((tag) => tag.value || tag),
+    };
+    const data = handleSubmitHelper(payload);
     if (data) {
       if (id) {
         response = await basicProvider.patchMethod(
@@ -77,6 +103,7 @@ function Create() {
     if (id && id !== "undefined") {
       fetchData();
     }
+    fetchCategories();
     fetchTypes();
   }, []);
   return (
@@ -184,6 +211,28 @@ function Create() {
                   Cancel
                 </button>
               </div>
+            </div>
+          </TableLayoutComp>
+          <TableLayoutComp title={"Categories"}>
+            <div className="cp">
+              <JsTreeCheckbox
+                data={categories}
+                defaultChecked={defaultCategories}
+                onCheck={(c) =>
+                  setInitialValues((pre) => ({ ...pre, categories: c }))
+                }
+              />
+            </div>
+          </TableLayoutComp>
+          <TableLayoutComp title={"Tags"}>
+            <div className="cp">
+              <MultiSelectDropdown
+                endPoint={"configuration/tages"}
+                value={initialValues.tags}
+                setValue={(value) => {
+                  setInitialValues((pre) => ({ ...pre, tags: value }));
+                }}
+              />
             </div>
           </TableLayoutComp>
           <TableLayoutComp title={"Slug"}>

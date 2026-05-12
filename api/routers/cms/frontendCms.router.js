@@ -5,6 +5,8 @@ import { getFrontendGalleryBySlug } from "../../controllers/cms/gallery.controll
 import {
   getPostsBySlug,
   getPostsByType,
+  getRecentPostsByType,
+  getRelatedPosts,
 } from "../../controllers/cms/post.controller.js";
 import { getFrontendSlidersBySlug } from "../../controllers/cms/slider.controller.js";
 import { getFrontendTestimonialByType } from "../../controllers/cms/testimonial.controller.js";
@@ -19,6 +21,8 @@ router.get("/gallery/:slug", getFrontendGalleryBySlug);
 // Posts
 
 router.get("/posts/type/:type", getPostsByType);
+router.get("/posts/recent/:type", getRecentPostsByType);
+router.get("/posts/related/:slug", getRelatedPosts);
 router.get("/posts/:slug", getPostsBySlug);
 
 // slider
