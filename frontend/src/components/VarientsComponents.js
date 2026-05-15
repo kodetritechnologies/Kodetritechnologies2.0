@@ -2,6 +2,8 @@
 
 import { useState, useMemo, useEffect } from "react"
 import { useRouter } from "next/navigation"
+import WishlistButton from "./WishlistButton"
+import AddToCartButton from "./AddToCartButton"
 
 export default function VarientsComponents({ data, initialVariantSlug }) {
 
@@ -165,7 +167,7 @@ export default function VarientsComponents({ data, initialVariantSlug }) {
             <div className="tf-product-total-quantity">
                 <p>Quantity:</p>
 
-                <div className="group-action">
+                <div className="group-action gap-3">
                     <div className="wg-quantity">
                         <button
                             className="btn-quantity btn-decrease"
@@ -189,12 +191,19 @@ export default function VarientsComponents({ data, initialVariantSlug }) {
                             +
                         </button>
                     </div>
-                    <button className="btn-action-price tf-btn type-xl w-100">
-                        Add To Cart
-                        <span className="custom-price-add">
-                            ₹{price * quantity}
-                        </span>
-                    </button>
+                    <AddToCartButton
+                        productId={data?._id}
+                        variantId={selectedVariant?._id}
+                        quantity={quantity}
+                        price={price}
+                        productDetails={{
+                            name: data?.name,
+                            featured_image: data?.featured_image,
+                            variantName: selectedVariant?.name
+                        }}
+                        className="btn-action-price tf-btn type-xl"
+                    />
+                    <WishlistButton productId={data?._id} varient_id={selectedVariant?._id} size="24px" />
                 </div>
             </div>
         </div>

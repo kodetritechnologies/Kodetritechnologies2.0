@@ -331,10 +331,6 @@ function FooterSetting() {
         <TableLayoutComp title={"Quick Links"}>
           <div className="quickLinkCard cp">
             <div>
-              {/* <SummernoteEditor
-                initialValues={quickLinks?.content}
-                setInitialValues={setQuickLinks}
-              /> */}
               <JoditTextEditor
                 initialValues={quickLinks?.content}
                 setInitialValues={(value) => {

@@ -1,10 +1,14 @@
 "use client";
 import { useContext } from "react";
 import { AuthContext } from "@/utils/context/AuthContext";
+import { useWishlist } from "@/utils/context/WishlistContext";
+import { useCart } from "@/utils/context/CartContext";
 import Link from "next/link";
 
 function Header() {
-  const user = useContext(AuthContext);
+  const { user } = useContext(AuthContext);
+  const { wishlist } = useWishlist();
+  const { cart } = useCart();
 
   return (
     <header className="tf-header header-s2 scr-box-shadow">
@@ -83,8 +87,9 @@ function Header() {
                 </Link>
               </li>
               <li className="d-none d-sm-block">
-                <Link href="/wishlist" className="nav-icon-item link">
+                <Link href="/account/wishlist" className="nav-icon-item link shop-cart">
                   <i className="icon icon-HeartStraight"></i>
+                  <span className="count">{wishlist?.length || 0}</span>
                 </Link>
               </li>
               <li>
@@ -94,7 +99,7 @@ function Header() {
                   className="nav-icon-item link shop-cart"
                 >
                   <i className="icon icon-Handbag"></i>
-                  <span className="count">12</span>
+                  <span className="count">{cart?.length || 0}</span>
                 </a>
               </li>
             </ul>

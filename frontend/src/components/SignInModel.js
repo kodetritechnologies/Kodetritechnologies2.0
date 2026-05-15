@@ -2,9 +2,14 @@
 import BasicProvider from "@/utils/BasicProvider";
 import { useState } from "react";
 import toast from "react-hot-toast";
+import { useCart } from "@/utils/context/CartContext";
+import { useContext } from "react";
+import { AuthContext } from "@/utils/context/AuthContext";
 
 function SignInModel() {
   const basicProvider = BasicProvider();
+  const { getLocalStorageCart, clearLocalStorageCart, fetchCart } = useCart();
+  const { getUser } = useContext(AuthContext);
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -50,21 +55,32 @@ function SignInModel() {
     }
     setLoading(true);
     try {
+      const cartData = getLocalStorageCart();
+      const loginPayload = { ...formData, cartData };
+
       const response = await basicProvider.postMethod(
         "users/customer/login",
-        formData,
+        loginPayload,
       );
       if (response.status == "success") {
         toast.success(response?.message);
+        clearLocalStorageCart();
+        await getUser(); // Update user in AuthContext
+        await fetchCart(); // Refresh cart in CartContext
         setFormData({
           email: "",
           password: "",
         });
+        setLoading(false);
+        // Close modal if needed, but the user didn't ask for it specifically.
+        // Usually, these modals close on success.
       } else {
         toast.error(response?.message);
+        setLoading(false);
       }
     } catch (error) {
       console.error(error);
+      setLoading(false);
     }
   };
   return (

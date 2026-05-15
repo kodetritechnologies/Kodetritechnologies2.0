@@ -24,6 +24,7 @@ import {
   getAdminCustomersTrash,
   getCustomerProfile,
   customerLogOut,
+  getCustomerDashboardStats,
 } from "../../controllers/authentications/customer.controller.js";
 import {
   ownerCreate,
@@ -78,6 +79,11 @@ router.post(
 );
 router.get("/customer/profile", customerAuthMiddleware, getCustomerProfile);
 router.get("/customer/logout", customerAuthMiddleware, customerLogOut);
+router.get(
+  "/customer/dashboard",
+  customerAuthMiddleware,
+  getCustomerDashboardStats,
+);
 
 // admin routes
 router.post(

@@ -9,7 +9,7 @@ function page() {
   const basicProvider = BasicProvider();
   const [profile, setProfile] = useState(user);
   const [error, SetError] = useState(null);
-  console.log("Profile", profile);
+  console.log("Profile", user);
 
   const handleChange = async (e) => {
     const { name, value, files } = e.target;

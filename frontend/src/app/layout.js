@@ -5,7 +5,10 @@ import ScriptLoader from "@/components/partials/ScriptLoader";
 import Script from "next/script";
 import { Toaster } from "react-hot-toast";
 import AuthContextProvider from "@/utils/context/AuthContext";
+import WishlistProvider from "@/utils/context/WishlistContext";
 import { QuickViewProvider } from "@/utils/context/QuickViewContext";
+import { QuickAddProvider } from "@/utils/context/QuickAddContext";
+import CartProvider from "@/utils/context/CartContext";
 
 import AskModel from "@/components/AskModel";
 import CompareModel from "@/components/CompareModel";
@@ -43,23 +46,28 @@ export default function RootLayout({ children }) {
       </head>
       <body>
         <AuthContextProvider>
-          <QuickViewProvider>
-            <ScriptLoader />
-            <Header />
-            {children}
-            <SizeGuideModel />
-            <ShareModel />
-            <AskModel />
-            <CompareModel />
-            <QuickAddModel />
-            <QuickViewModel />
-            <Search />
-            <ShoppingCart />
-            <RegisterModel />
-            <SignInModel />
-            <NewsletterModel />
-            <Toaster position="top-right" />
-            <Footer />
+          <WishlistProvider>
+            <QuickViewProvider>
+            <QuickAddProvider>
+              <CartProvider>
+                <ScriptLoader />
+                <Header />
+                {children}
+                <SizeGuideModel />
+                <ShareModel />
+                <AskModel />
+                <CompareModel />
+                <QuickAddModel />
+                <QuickViewModel />
+                <Search />
+                <ShoppingCart />
+                <RegisterModel />
+                <SignInModel />
+                <NewsletterModel />
+                <Toaster position="top-right" />
+                <Footer />
+              </CartProvider>
+            </QuickAddProvider>
             <Script
               src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
               integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
@@ -93,8 +101,9 @@ export default function RootLayout({ children }) {
             <Script src="/assets/js/carousel.js" strategy="afterInteractive" />
             <Script src="/assets/js/main.js" strategy="afterInteractive" />
           </QuickViewProvider>
-        </AuthContextProvider>
-      </body>
+        </WishlistProvider>
+      </AuthContextProvider>
+    </body>
     </html>
   );
 }

@@ -1,8 +1,9 @@
 "use client";
 import { useQuickView } from "@/utils/context/QuickViewContext";
-import { productUrl } from "@/utils/helpers/productHelper";
 import Link from "next/link";
+import WishlistButton from "@/components/WishlistButton";
 import { useState, useMemo, useEffect } from "react";
+import { productUrl } from "@/utils/helpers/productHelper";
 
 function QuickViewModel() {
   const { quickViewProduct: product } = useQuickView();
@@ -240,6 +241,12 @@ function QuickViewModel() {
                       <span className="d-none d-sm-block d-md-none d-lg-block">&nbsp;-&nbsp;</span>
                       <span className="price-add d-none d-sm-block d-md-none d-lg-block">${(finalPrice * quantity).toFixed(2)}</span>
                     </a>
+                  </div>
+                  <div className="mt-3">
+                    <WishlistButton
+                      productId={product?._id}
+                      varient_id={selectedVariant?._id}
+                    />
                   </div>
                 </div>
               </div>

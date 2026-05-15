@@ -2,14 +2,27 @@
 import Link from "next/link";
 import { useContext } from "react";
 import { AuthContext } from "@/utils/context/AuthContext";
+import { usePathname } from "next/navigation";
 
 export default function Layout({ children }) {
   const { logout } = useContext(AuthContext);
+  const pathname = usePathname();
 
   const handleLogout = (e) => {
     e.preventDefault();
     logout();
   };
+
+  const navLinks = [
+    { href: "/account/dashboard", label: "Dashboard", icon: "icon-HouseLine" },
+    { href: "/account/profile", label: "Profile", icon: "icon-User" },
+    { href: "/account/orders", label: "Your Orders", icon: "icon-Package" },
+    { href: "/account/wishlist", label: "Wishlist", icon: "icon-Heart" },
+    { href: "/account/review", label: "Reviews", icon: "icon-Star" },
+    { href: "/account/addresses", label: "My Address", icon: "fa fa-address-book", isFA: true },
+    { href: "/account/coupons", label: "Coupons", icon: "icon-Tag" },
+    { href: "/account/support", label: "Support", icon: "fa fa-life-ring", isFA: true },
+  ];
 
   return (
     <main id="wrapper">
@@ -19,30 +32,16 @@ export default function Layout({ children }) {
             <div className="col-lg-4 col-xl-3">
               <div className="sidebar-account-wrap sidebar-content-wrap sticky-top d-lg-block d-none">
                 <div className="my-account-nav">
-                  <Link href="/account/dashboard" className="link-account active">
-                    <i className="icon icon-HouseLine"></i>
-                    <span className="text h6 fw-medium">Dashboard</span>
-                  </Link>
-                  <Link href="/account/profile" className="link-account">
-                    <i className="icon icon-User"></i>
-                    <span className="text h6 fw-medium">Profile</span>
-                  </Link>
-                  <Link href="/account/orders" className="link-account">
-                    <i className="icon icon-Package"></i>
-                    <span className="text h6 fw-medium">Your Orders</span>
-                  </Link>
-                  <Link href="/account/addresses" className="link-account">
-                    <i className="fa fa-address-book"></i>
-                    <span className="text h6 fw-medium">My Address</span>
-                  </Link>
-                  <Link href="/account/coupons" className="link-account">
-                    <i className="icon icon-Tag"></i>
-                    <span className="text h6 fw-medium">Coupons</span>
-                  </Link>
-                  <Link href="/account/support" className="link-account">
-                    <i className="fa fa-life-ring"></i>
-                    <span className="text h6 fw-medium">Support</span>
-                  </Link>
+                  {navLinks.map((link) => (
+                    <Link
+                      key={link.href}
+                      href={link.href}
+                      className={`link-account ${pathname === link.href ? "active" : ""}`}
+                    >
+                      <i className={link.isFA ? link.icon : `icon ${link.icon}`}></i>
+                      <span className="text h6 fw-medium">{link.label}</span>
+                    </Link>
+                  ))}
                   <Link href="#" onClick={handleLogout} className="link-account">
                     <i className="icon icon-SignOut"></i>
                     <span className="text h6 fw-medium">Logout</span>

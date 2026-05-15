@@ -109,13 +109,13 @@ export const getCustomerWishlist = async (req, res) => {
 
 export const addToWishlist = async (req, res) => {
   try {
-    const { _id,  } = req.customer;
-    const { item } = req.body;
+    const { _id } = req.customer;
+    const { item, varient_id } = req.body;
 
     const payload = {
       customer: _id,
       item,
-      
+      varient_id: varient_id && varient_id !== "" ? varient_id : null,
     };
 
     const isExist = await Wishlist.findOne(payload);
@@ -162,6 +162,42 @@ export const removeFromWishlist = async (req, res) => {
     res.status(200).json({
       status: "success",
       message: "Item removed from wishlist successfully",
+    });
+  } catch (error) {
+    return res.status(500).json({
+      status: "error",
+      message: "Internal server error",
+      error: error.message,
+    });
+  }
+};
+export const toggleWishlist = async (req, res) => {
+  try {
+    const { _id } = req.customer;
+    const { item, varient_id } = req.body;
+
+    const payload = {
+      customer: _id,
+      item,
+      varient_id: varient_id && varient_id !== "" ? varient_id : null,
+    };
+
+    const isExist = await Wishlist.findOne(payload);
+
+    if (isExist) {
+      await Wishlist.deleteOne({ _id: isExist._id });
+      return res.status(200).json({
+        status: "success",
+        message: "Item removed from wishlist successfully",
+        action: "removed",
+      });
+    }
+
+    await Wishlist.create(payload);
+    res.status(201).json({
+      status: "success",
+      message: "Item added to wishlist successfully",
+      action: "added",
     });
   } catch (error) {
     return res.status(500).json({

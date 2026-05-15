@@ -1,4 +1,34 @@
+"use client";
+import React, { useState, useEffect, useMemo } from "react";
+import { useQuickAdd } from "@/utils/context/QuickAddContext";
+import AddToCartButton from "./AddToCartButton";
+import { priceHelper, productUrl } from "@/utils/helpers/productHelper";
+import Link from "next/link";
+
 function QuickAddModel() {
+  const { quickAddProduct } = useQuickAdd();
+  const [selectedVariant, setSelectedVariant] = useState(null);
+  const [quantity, setQuantity] = useState(1);
+
+  useEffect(() => {
+    if (quickAddProduct) {
+      setQuantity(1);
+      if (quickAddProduct.type !== "simple" && quickAddProduct.varients?.length > 0) {
+        setSelectedVariant(quickAddProduct.varients[0]);
+      } else {
+        setSelectedVariant(null);
+      }
+    }
+  }, [quickAddProduct]);
+
+  if (!quickAddProduct) return null;
+
+  const { price, sale_price } = priceHelper(quickAddProduct, selectedVariant);
+  const currentPrice = sale_price || price;
+  const url = productUrl(quickAddProduct);
+
+  const productImg = selectedVariant?.gallery?.[0]?.url || quickAddProduct?.featured_image?.url || quickAddProduct?.gallery?.[0]?.url;
+
   return (
     <div className="modal modalCentered fade modal-quickadd" id="quickAdd">
       <div className="modal-dialog modal-dialog-centered">
@@ -11,161 +41,105 @@ function QuickAddModel() {
           </div>
           <div className="tf-product-quick_add tf-quick-prd_variant">
             <div className="product-mini-view">
-              <a href="product-detail.html" className="prd-image">
+              <Link href={url} className="prd-image">
                 <img
                   className="img-product"
                   width="80"
                   height="107"
-                  src="/assets/images/product/single/detail-1.jpg"
-                  alt="Image Product"
+                  src={productImg}
+                  alt={quickAddProduct.name}
                 />
-              </a>
+              </Link>
               <div className="prd-content">
-                <a
-                  href="product-detail.html"
+                <Link
+                  href={url}
                   className="prd-name fw-medium link-underline link text-capitalize"
                 >
-                  linen slim-fit shirt
-                </a>
+                  {quickAddProduct.name}
+                </Link>
                 <div className="price-wrap">
-                  <span className="price-new text-primary fw-semibold price-on-sale">
-                    $79.99
-                  </span>
-                  <span className="price-old text-caption-01 cl-text-3">
-                    $99,99
-                  </span>
+                  {sale_price ? (
+                    <>
+                      <span className="price-new text-primary fw-semibold price-on-sale">
+                        ${sale_price}
+                      </span>
+                      <span className="price-old text-caption-01 cl-text-3 ms-2">
+                        ${price}
+                      </span>
+                    </>
+                  ) : (
+                    <span className="price-new text-primary fw-semibold">
+                      ${price}
+                    </span>
+                  )}
                 </div>
               </div>
             </div>
-            <div className="quick-variant-picker picker_color">
-              <div className="variant-picker_label mb-12">
-                <div>
-                  Colors:
-                  <span className="variant__value text-capitalize fw-medium">
-                    Gray
-                  </span>
-                </div>
-              </div>
-              <div className="variant-picker_values">
-                <div className="hover-tooltip tooltip-bot color_btn style-image active">
-                  <div className="img">
-                    <img
-                      loading="lazy"
-                      width="60"
-                      height="60"
-                      src="/assets/images/product/single/img_square/detail-1_2.jpg"
-                      data-src="/assets/images/product/single/detail-1.jpg"
-                      alt="img"
-                    />
+
+            {quickAddProduct.type !== "simple" && quickAddProduct.varients?.length > 0 && (
+              <div className="quick-variant-picker picker_size mt-4">
+                <div className="variant-picker_label mb-12">
+                  <div>
+                    Select Option:
+                    <span className="variant__value text-capitalize fw-medium ms-1">
+                      {selectedVariant?.name}
+                    </span>
                   </div>
-                  <span className="tooltip color__label">Green</span>
                 </div>
-                <div className="hover-tooltip tooltip-bot color_btn style-image">
-                  <div className="img">
-                    <img
-                      loading="lazy"
-                      width="60"
-                      height="60"
-                      src="/assets/images/product/single/img_square/detail-1_5.jpg"
-                      data-src="/assets/images/product/single/detail-1_5.jpg"
-                      alt="img"
-                    />
-                  </div>
-                  <span className="tooltip color__label">Gray</span>
+                <div className="variant-picker_values d-flex flex-wrap gap-2">
+                  {quickAddProduct.varients.map((v) => (
+                    <span
+                      key={v._id}
+                      className={`size_btn ${selectedVariant?._id === v._id ? "active" : ""}`}
+                      onClick={() => setSelectedVariant(v)}
+                      style={{ cursor: "pointer", border: "1px solid #ddd", padding: "5px 15px", borderRadius: "4px" }}
+                    >
+                      {v.name}
+                    </span>
+                  ))}
                 </div>
               </div>
-            </div>
-            <div className="quick-variant-picker picker_size">
-              <div className="variant-picker_label mb-12">
-                <div>
-                  Size:
-                  <span className="variant__value text-capitalize fw-medium">
-                    L
-                  </span>
-                </div>
-                <a
-                  href="#findSize"
-                  data-bs-toggle="modal"
-                  className="tf-btn-line-2 style-primary text-caption-01 fw-semibold"
-                >
-                  Size Guide
-                </a>
-              </div>
-              <div className="variant-picker_values">
-                <span
-                  className="size_btn"
-                  data-quick-size="S"
-                  data-quick-price="39.99"
-                >
-                  S
-                </span>
-                <span
-                  className="size_btn"
-                  data-quick-size="M"
-                  data-quick-price="59.99"
-                >
-                  M
-                </span>
-                <span
-                  className="size_btn active"
-                  data-quick-size="L"
-                  data-quick-price="79.99"
-                >
-                  L
-                </span>
-                <span
-                  className="size_btn"
-                  data-quick-size="XL"
-                  data-quick-price="89.99"
-                >
-                  XL
-                </span>
-                <span
-                  className="size_btn disabled"
-                  data-quick-size="XX"
-                  data-quick-price="99.99"
-                >
-                  XXL
-                </span>
-              </div>
-            </div>
-            <div className="product-total-quantity">
-              <p className="">Quantity:</p>
+            )}
+
+            <div className="product-total-quantity mt-4">
+              <p className="mb-2">Quantity:</p>
               <div className="group-action">
                 <div className="wg-quantity">
-                  <button className="btn-quantity btn-decrease">
+                  <button 
+                    className="btn-quantity btn-decrease"
+                    onClick={() => setQuantity(q => Math.max(1, q - 1))}
+                  >
                     <i className="icon icon-minus"></i>
                   </button>
                   <input
                     className="quantity-product"
                     type="text"
                     name="number"
-                    value={1}
+                    value={quantity}
+                    readOnly
                   />
-                  <button className="btn-quantity btn-increase">
+                  <button 
+                    className="btn-quantity btn-increase"
+                    onClick={() => setQuantity(q => q + 1)}
+                  >
                     <i className="icon icon-plus"></i>
                   </button>
                 </div>
-                <a
-                  href="#shoppingCart"
-                  data-bs-toggle="offcanvas"
+                <AddToCartButton
+                  productId={quickAddProduct._id}
+                  variantId={selectedVariant?._id}
+                  quantity={quantity}
+                  price={currentPrice}
+                  productDetails={{
+                    name: quickAddProduct.name,
+                    featured_image: quickAddProduct.featured_image || quickAddProduct.gallery?.[0],
+                    variantName: selectedVariant?.name
+                  }}
                   className="btn-action-price tf-btn type-xl animate-btn w-100"
                 >
-                  Add to Cart
-                  <span className="d-none d-sm-block d-md-none d-lg-block">
-                    &nbsp;-&nbsp;
-                  </span>
-                  <span className="price-add d-none d-sm-block d-md-none d-lg-block">
-                    $79.99
-                  </span>
-                </a>
+                  Add to Cart - ${currentPrice * quantity}
+                </AddToCartButton>
               </div>
-              <a
-                href="checkout.html"
-                className="tf-btn type-xl btn-primary animate-btn w-100"
-              >
-                Buy It Now
-              </a>
             </div>
           </div>
         </div>

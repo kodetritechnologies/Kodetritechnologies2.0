@@ -51,6 +51,15 @@ async function Footer() {
   const quickLinks = await getQuickLinks();
   const supportLinks = await getSupportLinks();
   const socialLinks = await getSocialLinks();
+
+  const transformContent = (html) => {
+    if (!html) return "";
+    return html
+      .replace(/<link/g, "<a")
+      .replace(/<\/link>/g, "</a>")
+      .replace(/classname=/g, "class=");
+  };
+
   return (
     <footer className="tf-footer">
       <div className="footer-inner flat-spacing position-relative">
@@ -122,11 +131,11 @@ async function Footer() {
                   Quick Links
                 </p>
                 <div className="tf-collapse-content">
-                  <span
+                  <div
                     dangerouslySetInnerHTML={{
-                      __html: quickLinks?.value?.content,
+                      __html: transformContent(quickLinks?.value?.content),
                     }}
-                  ></span>
+                  ></div>
                 </div>
               </div>
             </div>
@@ -136,11 +145,11 @@ async function Footer() {
                   Support Links
                 </p>
                 <div className="tf-collapse-content">
-                  <span
+                  <div
                     dangerouslySetInnerHTML={{
-                      __html: supportLinks?.value?.content,
+                      __html: transformContent(supportLinks?.value?.content),
                     }}
-                  ></span>
+                  ></div>
                 </div>
               </div>
             </div>

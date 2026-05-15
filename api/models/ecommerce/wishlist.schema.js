@@ -13,6 +13,11 @@ const wishlistsSchema = new mongoose.Schema(
       ref: "Item",
       required: true,
     },
+    varient_id: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Varient",
+      default: null,
+    },
     deletedAt: {
       type: Date,
       default: null,
@@ -23,14 +28,14 @@ const wishlistsSchema = new mongoose.Schema(
 
 wishlistsSchema.pre("find", function (next) {
   this.populate("customer");
-  this.populate("");
   this.populate("item");
+  this.populate("varient_id");
   next();
 });
 wishlistsSchema.pre("findOne", function (next) {
   this.populate("customer");
-  this.populate("");
   this.populate("item");
+  this.populate("varient_id");
   next();
 });
 

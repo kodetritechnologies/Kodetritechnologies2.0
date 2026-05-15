@@ -1,12 +1,47 @@
-function page() {
+import { serviceProvider } from "@/utils/serviceProvider";
+
+async function page() {
+  const { getMethod } = await serviceProvider();
+  const response = await getMethod("users/customer/dashboard");
+  const stats = response?.data || {
+    wishlistCount: 0,
+    supportTicketCount: 0,
+    reviewCount: 0,
+    totalOrderCount: 0,
+    recentOrders: [],
+  };
+
+  const statBoxes = [
+    {
+      label: "Wishlist",
+      count: stats.wishlistCount,
+      icon: "icon-Heart",
+    },
+    {
+      label: "Support Ticket",
+      count: stats.supportTicketCount,
+      icon: "icon-Lifebuoy",
+    },
+    {
+      label: "Reviews",
+      count: stats.reviewCount,
+      icon: "icon-Star",
+    },
+    {
+      label: "Total Orders",
+      count: stats.totalOrderCount,
+      icon: "icon-Package",
+    },
+  ];
+
   return (
-    <div class="col-lg-8 ms-auto">
-      <div class="my-account-content">
-        <h4 class="account-title">Dashboard</h4>
-        <div class="acount-order_stats">
+    <div className="col-lg-8 ms-auto">
+      <div className="my-account-content">
+        <h4 className="account-title">Dashboard</h4>
+        <div className="acount-order_stats">
           <div
             dir="ltr"
-            class="swiper tf-swiper"
+            className="swiper tf-swiper"
             data-preview={3}
             data-tablet={3}
             data-mobile-sm={2}
@@ -19,48 +54,28 @@ function page() {
             data-pagination-md={3}
             data-pagination-lg={3}
           >
-            <div class="swiper-wrapper">
-              <div class="swiper-slide">
-                <div class="order-box">
-                  <div class="order_info">
-                    <p class="info__label cl-text-2">Awaiting Pickup</p>
-                    <h5 class="info__count type-semibold">4</h5>
-                  </div>
-                  <div class="order_icon">
-                    <i class="icon icon-HourglassMedium"></i>
-                  </div>
-                </div>
-              </div>
-              <div class="swiper-slide">
-                <div class="order-box">
-                  <div class="order_info">
-                    <p class="info__label cl-text-2">Cancelled Orders</p>
-                    <h5 class="info__count type-semibold">12</h5>
-                  </div>
-                  <div class="order_icon">
-                    <i class="icon icon-ReceiptX"></i>
+            <div className="swiper-wrapper">
+              {statBoxes.map((box, index) => (
+                <div className="swiper-slide" key={index}>
+                  <div className="order-box">
+                    <div className="order_info">
+                      <p className="info__label cl-text-2">{box.label}</p>
+                      <h5 className="info__count type-semibold">{box.count}</h5>
+                    </div>
+                    <div className="order_icon">
+                      <i className={`icon ${box.icon}`}></i>
+                    </div>
                   </div>
                 </div>
-              </div>
-              <div class="swiper-slide">
-                <div class="order-box">
-                  <div class="order_info">
-                    <p class="info__label cl-text-2">Total Number of Orders</p>
-                    <h5 class="info__count type-semibold">200</h5>
-                  </div>
-                  <div class="order_icon">
-                    <i class="icon icon-Package"></i>
-                  </div>
-                </div>
-              </div>
+              ))}
             </div>
-            <div class="sw-dot-default tf-sw-pagination"></div>
+            <div className="sw-dot-default tf-sw-pagination"></div>
           </div>
         </div>
-        <div class="account-my_recent">
-          <h6 class="title-case">Recent Orders</h6>
-          <div class="overflow-auto">
-            <table class="table-my_recent">
+        <div className="account-my_recent">
+          <h6 className="title-case">Recent Orders</h6>
+          <div className="overflow-auto">
+            <table className="table-my_recent">
               <thead>
                 <tr>
                   <th>Order</th>
@@ -70,204 +85,66 @@ function page() {
                 </tr>
               </thead>
               <tbody>
-                <tr class="tb-order-item">
-                  <td class="tb-order_code fw-medium">54312453</td>
-                  <td>
-                    <div class="tb-order_product">
-                      <a href="product-detail.html" class="img-prd">
-                        <img
-                          loading="lazy"
-                          width="48"
-                          height="48"
-                          src="/assets/images/product/square/product-1_2.jpg"
-                          alt="Image"
-                        />
-                      </a>
-                      <div class="infor-prd">
-                        <a
-                          href="product-detail.html"
-                          class="prd_name link fw-medium lh-24"
-                        >
-                          Faux-leather trousers
-                        </a>
-                        <p class="prd_type cl-text-2 text-caption-01">
-                          Women, Clothing
-                        </p>
-                      </div>
-                    </div>
-                  </td>
-                  <td class="tb-order_price fw-medium ">$45.00</td>
-                  <td>
-                    <div class="tb-order_status text-label stt-pending">
-                      Pending
-                    </div>
-                  </td>
-                </tr>
-                <tr class="tb-order-item">
-                  <td class="tb-order_code fw-medium">54312452</td>
-                  <td>
-                    <div class="tb-order_product">
-                      <a href="product-detail.html" class="img-prd">
-                        <img
-                          loading="lazy"
-                          width="48"
-                          height="48"
-                          src="/assets/images/product/square/product-2.jpg"
-                          alt="Image"
-                        />
-                      </a>
-                      <div class="infor-prd">
-                        <a
-                          href="product-detail.html"
-                          class="prd_name link fw-medium lh-24"
-                        >
-                          Contrasting sweatshirt
-                        </a>
-                        <p class="prd_type cl-text-2 text-caption-01">
-                          Women, Clothing
-                        </p>
-                      </div>
-                    </div>
-                  </td>
-                  <td class="tb-order_price fw-medium ">$45.00</td>
-                  <td>
-                    <div class="tb-order_status text-label stt-delivery">
-                      Delivery
-                    </div>
-                  </td>
-                </tr>
-                <tr class="tb-order-item" />
-                <td class="tb-order_code fw-medium">54312452</td>
-                <td>
-                  <div class="tb-order_product">
-                    <a href="product-detail.html" class="img-prd">
-                      <img
-                        loading="lazy"
-                        width="48"
-                        height="48"
-                        src="/assets/images/product/square/product-4_2.jpg"
-                        alt="Image"
-                      />
-                    </a>
-                    <div class="infor-prd">
-                      <a
-                        href="product-detail.html"
-                        class="prd_name link fw-medium lh-24"
-                      >
-                        V-neck knitted top
-                      </a>
-                      <p class="prd_type cl-text-2 text-caption-01">
-                        Women, Clothing
-                      </p>
-                    </div>
-                  </div>
-                </td>
-                <td class="tb-order_price fw-medium ">$45.00</td>
-                <td>
-                  <div class="tb-order_status text-label stt-completed">
-                    Completed
-                  </div>
-                </td>
-
-                <tr class="tb-order-item">
-                  <td class="tb-order_code fw-medium">54312452</td>
-                  <td>
-                    <div class="tb-order_product">
-                      <a href="product-detail.html" class="img-prd">
-                        <img
-                          loading="lazy"
-                          width="48"
-                          height="48"
-                          src="/assets/images/product/square/product-5_3.jpg"
-                          alt="Image"
-                        />
-                      </a>
-                      <div class="infor-prd">
-                        <a
-                          href="product-detail.html"
-                          class="prd_name link fw-medium lh-24"
-                        >
-                          Contrasting sweatshirt
-                        </a>
-                        <p class="prd_type cl-text-2 text-caption-01">
-                          Women, Clothing
-                        </p>
-                      </div>
-                    </div>
-                  </td>
-                  <td class="tb-order_price fw-medium ">$45.00</td>
-                  <td>
-                    <div class="tb-order_status text-label stt-pending">
-                      Pending
-                    </div>
-                  </td>
-                </tr>
-                <tr class="tb-order-item">
-                  <td class="tb-order_code fw-medium">54312456</td>
-                  <td>
-                    <div class="tb-order_product">
-                      <a href="product-detail.html" class="img-prd">
-                        <img
-                          loading="lazy"
-                          width="48"
-                          height="48"
-                          src="/assets/images/product/square/product-7_2.jpg"
-                          alt="Image"
-                        />
-                      </a>
-                      <div class="infor-prd">
-                        <a
-                          href="product-detail.html"
-                          class="prd_name link fw-medium lh-24"
-                        >
-                          Faux-leather trousers
-                        </a>
-                        <p class="prd_type cl-text-2 text-caption-01">
-                          Women, Clothing
-                        </p>
-                      </div>
-                    </div>
-                  </td>
-                  <td class="tb-order_price fw-medium ">$45.00</td>
-                  <td>
-                    <div class="tb-order_status text-label stt-delivery">
-                      Delivery
-                    </div>
-                  </td>
-                </tr>
-                <tr class="tb-order-item">
-                  <td class="tb-order_code fw-medium">54312457</td>
-                  <td>
-                    <div class="tb-order_product">
-                      <a href="product-detail.html" class="img-prd">
-                        <img
-                          loading="lazy"
-                          width="48"
-                          height="48"
-                          src="/assets/images/product/square/product-9_2.jpg"
-                          alt="Image"
-                        />
-                      </a>
-                      <div class="infor-prd">
-                        <a
-                          href="product-detail.html"
-                          class="prd_name link fw-medium lh-24"
-                        >
-                          V-neck knitted top
-                        </a>
-                        <p class="prd_type cl-text-2 text-caption-01">
-                          Women, Clothing
-                        </p>
-                      </div>
-                    </div>
-                  </td>
-                  <td class="tb-order_price fw-medium ">$45.00</td>
-                  <td>
-                    <div class="tb-order_status text-label stt-canceled">
-                      Canceled
-                    </div>
-                  </td>
-                </tr>
+                {stats.recentOrders && stats.recentOrders.length > 0 ? (
+                  stats.recentOrders.map((order) => {
+                    const firstItem = order.items && order.items[0];
+                    return (
+                      <tr className="tb-order-item" key={order._id}>
+                        <td className="tb-order_code fw-medium">
+                          {order.order_no || order._id.slice(-8)}
+                        </td>
+                        <td>
+                          <div className="tb-order_product">
+                            <a href="#" className="img-prd">
+                              <img
+                                loading="lazy"
+                                width="48"
+                                height="48"
+                                src={
+                                  firstItem?.featured_image?.url ||
+                                  "/assets/images/product/square/product-1_2.jpg"
+                                }
+                                alt={firstItem?.name || "Product"}
+                              />
+                            </a>
+                            <div className="infor-prd">
+                              <a
+                                href="#"
+                                className="prd_name link fw-medium lh-24"
+                              >
+                                {firstItem?.name || "Unknown Product"}
+                                {order.items?.length > 1 &&
+                                  ` +${order.items.length - 1} more`}
+                              </a>
+                              <p className="prd_type cl-text-2 text-caption-01">
+                                {firstItem?.categories
+                                  ?.map((c) => c.name)
+                                  .join(", ") || "General"}
+                              </p>
+                            </div>
+                          </div>
+                        </td>
+                        <td className="tb-order_price fw-medium ">
+                          {order.currency_symbol || "₹"}
+                          {order.total?.toFixed(2)}
+                        </td>
+                        <td>
+                          <div
+                            className={`tb-order_status text-label stt-${order.status?.toLowerCase().replace(" ", "-")}`}
+                          >
+                            {order.status || "Pending"}
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })
+                ) : (
+                  <tr>
+                    <td colSpan="4" className="text-center py-4">
+                      No recent orders found.
+                    </td>
+                  </tr>
+                )}
               </tbody>
             </table>
           </div>

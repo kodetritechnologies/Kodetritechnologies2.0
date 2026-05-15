@@ -2,6 +2,8 @@ import { priceHelper, productUrl } from "@/utils/helpers/productHelper";
 import { serviceProvider } from "@/utils/serviceProvider";
 import Link from "next/link";
 import QuickViewButton from "@/components/QuickViewButton";
+import WishlistButton from "@/components/WishlistButton";
+import QuickAddButton from "@/components/QuickAddButton";
 
 async function TopTrending() {
   const serverProvider = await serviceProvider();
@@ -94,13 +96,10 @@ async function TopTrending() {
                       )}
                       <ul className="product-action_list">
                         <li className="wishlist">
-                          <a
-                            href="#;"
-                            className="hover-tooltip tooltip-left box-icon"
-                          >
-                            <span className="icon icon-heart"></span>
-                            <span className="tooltip">Add to Wishlist</span>
-                          </a>
+                          <WishlistButton
+                            productId={product._id}
+                            varient_id={product.type !== "simple" ? (product.varients?.[0]?._id || product.varients?.[0]) : null}
+                          />
                         </li>
                         <li className="compare">
                           <a
@@ -122,13 +121,7 @@ async function TopTrending() {
                         </li>
                       </ul>
                       <div className="product-action_bot">
-                        <a
-                          href="#quickAdd"
-                          data-bs-toggle="modal"
-                          className="tf-btn btn-white small  w-100"
-                        >
-                          Quick Add
-                        </a>
+                        <QuickAddButton product={product} />
                       </div>
                       <div className="product-marquee_sale">
                         <div className="marquee-wrapper">

@@ -1,7 +1,9 @@
 import GalleryComponent from "@/components/GalleryComponent";
 import ProductDescription from "@/components/Shop/ProductDescription";
-import RelateProduct from "@/components/Shop/RelateProduct";
 import { serviceProvider } from "@/utils/serviceProvider";
+import WishlistButton from "@/components/WishlistButton";
+import RelateProduct from "@/components/Shop/RelateProduct";
+import AddToCartButton from "@/components/AddToCartButton";
 
 async function page({ params }) {
   const { slug } = await params;
@@ -78,7 +80,7 @@ async function page({ params }) {
                   <div className="tf-product-variant">
                     <div className="tf-product-total-quantity">
                       <p className="">Quantity:</p>
-                      <div className="group-action">
+                      <div className="group-action gap-3">
                         <div className="wg-quantity">
                           <button className="btn-quantity btn-decrease">
                             <i className="icon icon-minus"></i>
@@ -93,26 +95,16 @@ async function page({ params }) {
                             <i className="icon icon-plus"></i>
                           </button>
                         </div>
-                        <a
-                          href="#shoppingCart"
-                          data-bs-toggle="offcanvas"
-                          className="btn-action-price tf-btn type-xl animate-btn w-100"
-                        >
-                          Add To Cart
-                          <span className="d-none d-sm-block d-md-none d-lg-block">
-                            &nbsp;-&nbsp;
-                          </span>
-                          <span className="price-add d-none d-sm-block d-md-none d-lg-block">
-                            $79.99
-                          </span>
-                        </a>
+                        <AddToCartButton
+                          productId={productDetails?._id}
+                          price={productDetails?.sale_price || productDetails?.price}
+                          productDetails={{
+                            name: productDetails?.name,
+                            featured_image: productDetails?.featured_image
+                          }}
+                        />
+                        <WishlistButton productId={productDetails?._id} size="24px" />
                       </div>
-                      <a
-                        href="checkout.html"
-                        className="tf-btn type-xl btn-primary animate-btn w-100"
-                      >
-                        Buy It Now
-                      </a>
                     </div>
                   </div>
                   <div className="tf-product-extra-link">

@@ -8,6 +8,8 @@ import { slugGenerator } from "../../helpers/slugGenerator.js";
 import Faq from "../../models/cms/faq.schema.js";
 import Item from "../../models/ecommerce/item.schema.js";
 import Varient from "../../models/ecommerce/varient.schema.js";
+import Post from "../../models/cms/post.schema.js";
+import Categories from "../../models/configuration/master/categories.schema.js";
 
 export const getItems = async (req, res) => {
   try {
@@ -577,6 +579,59 @@ export const getRelatedItems = async (req, res) => {
       status: "success",
       message: "fetch related items successfully",
       data: response,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      status: "error",
+      message: "Internal server error",
+      error: error.message,
+    });
+  }
+};
+
+export const globalSearch = async (req, res) => {
+  try {
+    const { q } = req.query;
+    if (!q) {
+      return res.status(200).json({
+        status: "success",
+        data: {
+          items: [],
+          posts: [],
+          categories: [],
+        },
+      });
+    }
+
+    const searchRegex = new RegExp(q, "i");
+
+    const [items, posts, categories] = await Promise.all([
+      Item.find({
+        deletedAt: null,
+        $or: [
+          { name: searchRegex },
+          { short_content: searchRegex },
+          { long_content: searchRegex },
+        ],
+      }).limit(5),
+      Post.find({
+        deletedAt: null,
+        $or: [{ title: searchRegex }, { content: searchRegex }],
+      }).limit(5),
+      Categories.find({
+        deletedAt: null,
+        name: searchRegex,
+      }).limit(5),
+    ]);
+
+    return res.status(200).json({
+      status: "success",
+      message: "Global search completed",
+      data: {
+        items,
+        posts,
+        categories,
+      },
     });
   } catch (error) {
     return res.status(500).json({

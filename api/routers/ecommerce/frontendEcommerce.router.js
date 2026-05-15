@@ -11,6 +11,7 @@ import {
   getPublicItemBySlugOrId,
   getPublicItems,
   getRelatedItems,
+  globalSearch,
 } from "../../controllers/ecommerce/item.controller.js";
 import {
   claimCoupan,
@@ -22,6 +23,7 @@ import {
   addToWishlist,
   getCustomerWishlist,
   removeFromWishlist,
+  toggleWishlist,
 } from "../../controllers/ecommerce/wishlist.controller.js";
 import {
   createCustomerAddress,
@@ -51,6 +53,7 @@ router.delete(
 router.get("/item/all", getPublicItems);
 router.get("/item/related/:id", getRelatedItems);
 router.get("/item/:id", getPublicItemBySlugOrId);
+router.get("/global-search", globalSearch);
 
 // Coupan
 
@@ -63,6 +66,7 @@ router.post("/verify-coupon", verifyCoupon);
 
 router.get("/wishlist", customerAuthMiddleware, getCustomerWishlist);
 router.post("/wishlist/create", customerAuthMiddleware, addToWishlist);
+router.post("/wishlist/toggle", customerAuthMiddleware, toggleWishlist);
 router.delete(
   "/wishlist/remove/:id",
   customerAuthMiddleware,

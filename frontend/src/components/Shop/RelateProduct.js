@@ -2,6 +2,7 @@ import { priceHelper, productUrl } from "@/utils/helpers/productHelper";
 import { serviceProvider } from "@/utils/serviceProvider";
 import Link from "next/link";
 import QuickViewButton from "@/components/QuickViewButton";
+import WishlistButton from "@/components/WishlistButton";
 
 async function RelateProduct({ productId }) {
 
@@ -105,13 +106,10 @@ async function RelateProduct({ productId }) {
                           )}
                           <ul className="product-action_list">
                             <li className="wishlist">
-                              <a
-                                href="#;"
-                                className="hover-tooltip tooltip-left box-icon"
-                              >
-                                <span className="icon icon-heart"></span>
-                                <span className="tooltip">Add to Wishlist</span>
-                              </a>
+                              <WishlistButton
+                                productId={product._id}
+                                varient_id={product.type !== "simple" ? (product.varients?.[0]?._id || product.varients?.[0]) : null}
+                              />
                             </li>
                             <li className="compare">
                               <a

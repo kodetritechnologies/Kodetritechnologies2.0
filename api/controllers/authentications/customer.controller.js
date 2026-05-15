@@ -9,6 +9,11 @@ import {
 } from "../../helpers/mongooseHelper.js";
 import Customer from "../../models/authentications/customer.schema.js";
 import File from "../../models/file.schema.js";
+import Order from "../../models/ecommerce/order.schema.js";
+import Wishlist from "../../models/ecommerce/wishlist.schema.js";
+import SupportTicket from "../../models/support/support-ticket.schema.js";
+import Review from "../../models/ecommerce/review.schema.js";
+import Cart from "../../models/ecommerce/cart.schema.js";
 
 export const customerSignup = async (req, res) => {
   try {
@@ -103,6 +108,32 @@ export const customerLogin = async (req, res) => {
     }
 
     await adminsLogsHelper(req, "Customer logged in successfully");
+
+    // Sync Cart Data if provided
+    const { cartData } = req.body;
+    if (cartData && Array.isArray(cartData)) {
+      for (const item of cartData) {
+        try {
+          const query = {
+            customer: isExistCustomer._id,
+            itemId: item.itemId,
+            variantId: item.variantId || null,
+          };
+
+          const update = {
+            $inc: { quantity: item.quantity || 1 },
+            $setOnInsert: { price: item.price },
+          };
+
+          await Cart.findOneAndUpdate(query, update, { upsert: true });
+        } catch (syncError) {
+          console.error("Cart sync error:", syncError);
+          // We don't want to fail the login if cart sync fails, 
+          // but we could log it.
+        }
+      }
+    }
+
     return res.status(200).json({
       status: "success",
       message: "Customer logged in successfully",
@@ -525,6 +556,53 @@ export const adminCustomerRestoreTrash = async (req, res) => {
     return res.status(200).json({
       status: "success",
       message: "Customer restore successfully",
+    });
+  } catch (error) {
+    return res.status(500).json({
+      status: "error",
+      message: "Internal server error",
+      error: error.message,
+    });
+  }
+};
+
+export const getCustomerDashboardStats = async (req, res) => {
+  try {
+    const { _id } = req.customer;
+
+    const [
+      wishlistCount,
+      supportTicketCount,
+      reviewCount,
+      totalOrderCount,
+      recentOrders,
+    ] = await Promise.all([
+      Wishlist.countDocuments({ customer: _id, deletedAt: null }),
+      SupportTicket.countDocuments({ customer: _id, deletedAt: null }),
+      Review.countDocuments({ customer: _id, deletedAt: null }),
+      Order.countDocuments({ customer: _id, deletedAt: null }),
+      Order.find({ customer: _id, deletedAt: null })
+        .sort({ createdAt: -1 })
+        .limit(5)
+        .populate({
+          path: "items",
+          populate: [
+            { path: "featured_image", model: "File" },
+            { path: "categories", model: "Categories" },
+          ],
+        }),
+    ]);
+
+    return res.status(200).json({
+      status: "success",
+      message: "Customer dashboard stats fetched successfully",
+      data: {
+        wishlistCount,
+        supportTicketCount,
+        reviewCount,
+        totalOrderCount,
+        recentOrders,
+      },
     });
   } catch (error) {
     return res.status(500).json({
