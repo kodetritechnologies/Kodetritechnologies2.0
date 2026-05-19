@@ -12,42 +12,18 @@ export const getCustomerCart = async (req, res) => {
       deletedAt: null,
     };
 
-    const response = await Cart.aggregate([
-      { $match: query },
-
-      {
-        $addFields: {
-          itemTotal: { $multiply: ["$price", "$quantity"] },
-        },
-      },
-
-      {
-        $group: {
-          _id: null,
-          items: { $push: "$$ROOT" },
-          totalAmount: { $sum: "$itemTotal" },
-        },
-      },
-
-      {
-        $project: {
-          _id: 0,
-          items: {
-            itemId: 1,
-            variantId: 1,
-            quantity: 1,
-            price: 1,
-            itemTotal: 1,
-          },
-          totalAmount: 1,
-        },
-      },
-    ]);
+    const items = await Cart.find(query);
+    const totalAmount = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
 
     return res.status(200).json({
       status: "success",
       message: "Customer cart fetched successfully",
-      data: response,
+      data: [
+        {
+          items,
+          totalAmount,
+        }
+      ],
     });
   } catch (error) {
     return res.status(500).json({
@@ -66,7 +42,7 @@ export const addTocartCustomer = async (req, res) => {
     const payload = {
       customer: _id,
       itemId: body.itemId,
-      variantId: body.variantId,
+      variantId: body.variantId || null,
       price: body.price,
       quantity: body.quantity,
     };
@@ -74,13 +50,19 @@ export const addTocartCustomer = async (req, res) => {
     const alreadyExists = await Cart.findOne({
       customer: _id,
       itemId: body.itemId,
-      variantId: body.variantId,
+      variantId: body.variantId || null,
+      deletedAt: null,
     });
 
     if (alreadyExists) {
-      return res.status(409).json({
-        status: "error",
-        message: "Item already exists in cart. Please update quantity.",
+      const addedQuantity = Number(body.quantity) || 1;
+      await Cart.updateOne(
+        { _id: alreadyExists._id },
+        { $inc: { quantity: addedQuantity } }
+      );
+      return res.status(200).json({
+        status: "success",
+        message: "Item quantity updated in cart successfully",
       });
     }
 

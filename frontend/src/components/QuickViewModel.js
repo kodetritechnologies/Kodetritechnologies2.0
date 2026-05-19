@@ -2,6 +2,7 @@
 import { useQuickView } from "@/utils/context/QuickViewContext";
 import Link from "next/link";
 import WishlistButton from "@/components/WishlistButton";
+import AddToCartButton from "./AddToCartButton";
 import { useState, useMemo, useEffect } from "react";
 import { productUrl } from "@/utils/helpers/productHelper";
 
@@ -10,11 +11,13 @@ function QuickViewModel() {
 
   const variants = product?.varients || [];
 
+  const isSimple = product?.type === "simple" || !product?.type || variants.length === 0;
+
   const { colors, sizesMap } = useMemo(() => {
     const colorSet = new Set();
     const sizeMap = {};
 
-    if (variants && variants.length > 0) {
+    if (!isSimple && variants && variants.length > 0) {
       variants.forEach((v) => {
         if (!v.name) return;
         const parts = v.name.split(" / ");
@@ -35,7 +38,7 @@ function QuickViewModel() {
         Object.entries(sizeMap).map(([k, v]) => [k, Array.from(v)])
       ),
     };
-  }, [variants]);
+  }, [variants, isSimple]);
 
   const [selectedColor, setSelectedColor] = useState("");
   const [selectedSize, setSelectedSize] = useState("");
@@ -44,63 +47,99 @@ function QuickViewModel() {
   // Reset state when product changes
   useEffect(() => {
     setQuantity(1);
-    if (colors.length > 0) {
+    if (!isSimple && colors.length > 0) {
       setSelectedColor(colors[0]);
     } else {
       setSelectedColor("");
       setSelectedSize("");
     }
-  }, [product, colors]);
+  }, [product, colors, isSimple]);
 
   useEffect(() => {
-    if (selectedColor && sizesMap[selectedColor] && sizesMap[selectedColor].length > 0) {
+    if (!isSimple && selectedColor && sizesMap[selectedColor] && sizesMap[selectedColor].length > 0) {
       setSelectedSize(sizesMap[selectedColor][0]);
+    } else {
+      setSelectedSize("");
     }
-  }, [selectedColor, sizesMap]);
+  }, [selectedColor, sizesMap, isSimple]);
 
   const selectedVariant = useMemo(() => {
-    if (variants.length === 0) return null;
+    if (isSimple || variants.length === 0) return null;
+    
     if (selectedColor && selectedSize) {
-      return variants.find((v) => v.name === `${selectedColor} / ${selectedSize}`) || variants[0];
+      const match = variants.find((v) => v.name === `${selectedColor} / ${selectedSize}`);
+      if (match) return match;
     }
-    return variants[0];
-  }, [selectedColor, selectedSize, variants]);
+    
+    if (selectedColor) {
+      const match = variants.find((v) => {
+        if (!v.name) return false;
+        const parts = v.name.split(" / ");
+        return parts[0]?.trim() === selectedColor;
+      });
+      if (match) return match;
+    }
 
-  const isSimple = product?.type === "simple" || !product?.type || variants.length === 0;
+    return variants[0];
+  }, [selectedColor, selectedSize, variants, isSimple]);
 
   const url = product ? productUrl(product) : "#";
 
-  const gallery = isSimple
-    ? product?.gallery
-    : selectedVariant?.gallery?.length > 0
-      ? selectedVariant.gallery
-      : variants[0]?.gallery;
+  const parsePrice = (val) => {
+    if (val === undefined || val === null) return 0;
+    if (typeof val === "number") return val;
+    const str = String(val).trim();
+    const cleanStr = str.replace(/[^0-9.]/g, "");
+    const parsed = parseFloat(cleanStr);
+    return isNaN(parsed) ? 0 : parsed;
+  };
+
+  const gallery = useMemo(() => {
+    let images = [];
+    if (isSimple) {
+      if (product?.gallery && product.gallery.length > 0) {
+        images = [...product.gallery];
+      }
+      if (product?.featured_image) {
+        const featuredUrl = product.featured_image.url;
+        if (!images.some(img => img?.url === featuredUrl)) {
+          images.unshift(product.featured_image);
+        }
+      }
+    } else {
+      if (selectedVariant?.gallery && selectedVariant.gallery.length > 0) {
+        images = [...selectedVariant.gallery];
+      } else if (variants[0]?.gallery && variants[0].gallery.length > 0) {
+        images = [...variants[0].gallery];
+      }
+      if (images.length === 0 && product?.featured_image) {
+        images = [product.featured_image];
+      }
+    }
+
+    return images.map(img => {
+      if (typeof img === 'string') {
+        return { url: img };
+      }
+      if (img && typeof img === 'object' && img.url) {
+        return img;
+      }
+      return null;
+    }).filter(Boolean);
+  }, [isSimple, product, selectedVariant, variants]);
 
   const finalPrice = useMemo(() => {
-    const salePrice = selectedVariant?.sale_price || product?.sale_price;
-    const regularPrice = selectedVariant?.price || product?.price;
+    const salePrice = isSimple ? product?.sale_price : (selectedVariant?.sale_price || product?.sale_price);
+    const regularPrice = isSimple ? product?.price : (selectedVariant?.price || product?.price);
 
-    const p = salePrice ?? regularPrice ?? 0;
-
-    if (typeof p === 'string') {
-      const numericValue = parseFloat(p.replace(/[^0-9.]/g, ''));
-      return isNaN(numericValue) ? 0 : numericValue;
-    }
-
-    return p || 0;
-  }, [selectedVariant, product]);
+    return parsePrice(salePrice ?? regularPrice);
+  }, [isSimple, selectedVariant, product]);
 
   const originalPrice = useMemo(() => {
-    const regularPrice = selectedVariant?.price || product?.price;
-    const p = regularPrice ?? 0;
+    const regularPrice = isSimple ? product?.price : (selectedVariant?.price || product?.price);
 
-    if (typeof p === 'string') {
-      const numericValue = parseFloat(p.replace(/[^0-9.]/g, ''));
-      return isNaN(numericValue) ? 0 : numericValue;
-    }
-
-    return p || 0;
-  }, [selectedVariant, product]);
+    return parsePrice(regularPrice);
+  }, [isSimple, selectedVariant, product]);
 
   const hasSale = finalPrice < originalPrice && finalPrice > 0;
 
@@ -226,8 +265,8 @@ function QuickViewModel() {
               <div className="tf-product-variant">
                 <div className="tf-product-total-quantity">
                   <p className="">Quantity:</p>
-                  <div className="group-action">
-                    <div className="wg-quantity">
+                  <div className="d-flex align-items-center gap-3">
+                    <div className="wg-quantity flex-shrink-0">
                       <button className="btn-quantity btn-decrease" onClick={() => setQuantity((q) => Math.max(1, q - 1))}>
                         <i className="icon icon-minus"></i>
                       </button>
@@ -236,17 +275,30 @@ function QuickViewModel() {
                         <i className="icon icon-plus"></i>
                       </button>
                     </div>
-                    <a href="#shoppingCart" data-bs-toggle="offcanvas" className="btn-action-price tf-btn type-xl animate-btn w-100">
-                      Add to Cart
-                      <span className="d-none d-sm-block d-md-none d-lg-block">&nbsp;-&nbsp;</span>
-                      <span className="price-add d-none d-sm-block d-md-none d-lg-block">${(finalPrice * quantity).toFixed(2)}</span>
-                    </a>
-                  </div>
-                  <div className="mt-3">
-                    <WishlistButton
-                      productId={product?._id}
-                      varient_id={selectedVariant?._id}
-                    />
+                    <div className="flex-grow-1">
+                      <AddToCartButton
+                        productId={product?._id}
+                        variantId={isSimple ? null : selectedVariant?._id}
+                        quantity={quantity}
+                        price={finalPrice}
+                        productDetails={{
+                          name: product?.name,
+                          featured_image: product?.featured_image || product?.gallery?.[0],
+                          variantName: isSimple ? null : selectedVariant?.name
+                        }}
+                        className="btn-action-price tf-btn type-xl animate-btn w-100"
+                      >
+                        Add to Cart
+                        <span className="d-none d-sm-block d-md-none d-lg-block">&nbsp;-&nbsp;</span>
+                        <span className="price-add d-none d-sm-block d-md-none d-lg-block">${(finalPrice * quantity).toFixed(2)}</span>
+                      </AddToCartButton>
+                    </div>
+                    <div className="flex-shrink-0">
+                      <WishlistButton
+                        productId={product?._id}
+                        varient_id={isSimple ? null : selectedVariant?._id}
+                      />
+                    </div>
                   </div>
                 </div>
               </div>

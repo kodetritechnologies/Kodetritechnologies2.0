@@ -80,10 +80,19 @@ export default function CartProvider({ children }) {
         toast.success(response.message);
         fetchCart();
       } else if (response.status === "error" && response.message.includes("already exists")) {
-        // If it exists, we might want to update quantity instead of showing error
-        // The current backend API returns 409 if exists.
-        // We could call updateCartCustomer here if needed, but for now just toast the message.
-        toast.error(response.message);
+        const existingItem = cart.find(
+          (i) => {
+            const itemMatch = (i.itemId?._id || i.itemId) === itemId;
+            const variantMatch = (i.variantId?._id || i.variantId || null) === (variantId || null);
+            return itemMatch && variantMatch;
+          }
+        );
+        if (existingItem) {
+          await updateQuantity(existingItem._id, quantity, existingItem.quantity);
+          toast.success("Cart quantity updated");
+        } else {
+          toast.error(response.message);
+        }
       } else {
         toast.error(response.message || "Failed to add to cart");
       }

@@ -37,7 +37,7 @@ import {
   removeToCartCustomer,
   updateCartCustomer,
 } from "../../controllers/ecommerce/cart.controller.js";
-import { createPayment } from "../../controllers/ecommerce/order.controller.js";
+import { createPayment, placeOrder } from "../../controllers/ecommerce/order.controller.js";
 
 router.get("/reviews", customerAuthMiddleware, getCustomerReview);
 router.post("/reviews/create", customerAuthMiddleware, createCustomerReview);
@@ -90,5 +90,6 @@ router.delete("/cart/delete/:id", customerAuthMiddleware, removeToCartCustomer);
 // Order
 
 router.get("/order/payment", createPayment);
+router.post("/order/place", placeOrder);
 
 export default router;

@@ -4,6 +4,9 @@
 <head>
     <meta charset="UTF-8" />
     <title>Order Summary</title>
+    <% if (paymentConfig && paymentConfig.gatway === 'razorpay') { %>
+        <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <% } %>
     <style>
         * {
             margin: 0;
@@ -173,6 +176,31 @@
         .input-error {
             border: 2px solid red;
         }
+
+        /* Iframe-friendly adaptive styling */
+        body.in-iframe {
+            background: transparent;
+            min-height: auto;
+            display: block;
+            padding: 0;
+        }
+
+        body.in-iframe .order-summary {
+            width: 100%;
+            max-width: 100%;
+        }
+
+        body.in-iframe .card {
+            box-shadow: none;
+            padding: 12px 16px;
+            border-radius: 0;
+            border: none;
+            background: transparent;
+        }
+
+        body.in-iframe .card-title {
+            display: none; /* Hide since the parent modal already has a header */
+        }
     </style>
 </head>
 
@@ -191,7 +219,13 @@
                                     <div class="item-name">
                                         <%= item.item.name%>
                                     </div>
-                                    <div class="item-variant">Blue / Size 10</div>
+                                    <div class="item-variant">
+                                        <% if (item.variant && item.variant.name) { %>
+                                            <%= item.variant.name %>
+                                        <% } else { %>
+                                            Standard
+                                        <% } %>
+                                    </div>
                                 </div>
                                 <div class="item-qty">Qty: <%= item.quantity %>
                                 </div>
@@ -243,16 +277,132 @@
                         <input type="text" id="couponCode" placeholder="Enter coupon code" name="couponCode" class="" />
                         <button id="coupan_submit">Apply</button>
                     </div>
+                    <div id="message" style="color: #ef4444; font-size: 13px; margin: 4px 0 12px 4px; font-weight: 500; text-align: left;"></div>
                     <div class="action-btn">Place Order</div>
         </div>
     </div>
     <script>
+        // Check if inside iframe
+        if (window.self !== window.top) {
+            document.body.classList.add('in-iframe');
+        }
+
         let coupan_code = ""
         const messageBox = document.getElementById("message")
         const coupan_submit = document.querySelector('#coupan_submit')
+        const actionBtn = document.querySelector('.action-btn')
+
         document.getElementById("couponCode").addEventListener('keyup', (e) => {
             coupan_code = e.target.value.trim();
         })
+
+        // Place Order button click event handler (Razorpay & Direct fallback!)
+        actionBtn.addEventListener('click', async () => {
+            const isRazorpay = "<%= paymentConfig ? paymentConfig.gatway : '' %>" === 'razorpay';
+            
+            if (isRazorpay) {
+                try {
+                    const razorpayKey = "<%= paymentConfig ? paymentConfig.key_id : '' %>";
+                    const amountInPaise = Math.round(Number("<%= totalAmount %>") * 100);
+                    const currencyCode = "<%= currency_code %>";
+
+                    var options = {
+                        "key": razorpayKey,
+                        "amount": amountInPaise,
+                        "currency": currencyCode,
+                        "name": "Kodetri Store",
+                        "description": "Secure Order Payment",
+                        "handler": async function (response) {
+                            actionBtn.innerText = "Processing...";
+                            actionBtn.style.opacity = "0.7";
+                            actionBtn.style.pointerEvents = "none";
+
+                            try {
+                                const urlParams = new URLSearchParams(window.location.search);
+                                const customerId = urlParams.get('customerId') || "";
+
+                                const orderResponse = await fetch('/api/public/ecommerce/order/place', {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json'
+                                    },
+                                    body: JSON.stringify({
+                                        customerId,
+                                        transactionId: response.razorpay_payment_id,
+                                        paymentGateway: "razorpay"
+                                    })
+                                });
+
+                                const result = await orderResponse.json();
+
+                                if (result.status === "success") {
+                                    window.parent.postMessage({ type: 'CHECKOUT_SUCCESS' }, '*');
+                                } else {
+                                    actionBtn.innerText = "Place Order";
+                                    actionBtn.style.opacity = "1";
+                                    actionBtn.style.pointerEvents = "all";
+                                    alert(result.message || "Failed to process order creation.");
+                                }
+                            } catch (err) {
+                                console.error(err);
+                                alert("Failed to complete order submission.");
+                            }
+                        },
+                        "prefill": {
+                            "name": "",
+                            "email": "",
+                            "contact": ""
+                        },
+                        "theme": {
+                            "color": "#2563eb"
+                        }
+                    };
+                    var rzp = new window.Razorpay(options);
+                    rzp.open();
+                } catch (error) {
+                    console.error("Razorpay initiation failed:", error);
+                    alert("Unable to open Razorpay payment gateway.");
+                }
+                return;
+            }
+
+            // Direct mock/cash payment integration
+            actionBtn.innerText = "Processing...";
+            actionBtn.style.opacity = "0.7";
+            actionBtn.style.pointerEvents = "none";
+            
+            try {
+                // Get customerId from URL query string
+                const urlParams = new URLSearchParams(window.location.search);
+                const customerId = urlParams.get('customerId') || "";
+
+                const response = await fetch('/api/public/ecommerce/order/place', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ customerId })
+                });
+
+                const result = await response.json();
+
+                if (result.status === "success") {
+                    // Post success message to parent Next.js application
+                    window.parent.postMessage({ type: 'CHECKOUT_SUCCESS' }, '*');
+                } else {
+                    actionBtn.innerText = "Place Order";
+                    actionBtn.style.opacity = "1";
+                    actionBtn.style.pointerEvents = "all";
+                    alert(result.message || "Failed to place order");
+                }
+            } catch (error) {
+                console.error(error);
+                actionBtn.innerText = "Place Order";
+                actionBtn.style.opacity = "1";
+                actionBtn.style.pointerEvents = "all";
+                alert("An error occurred while placing your order.");
+            }
+        });
 
         coupan_submit.addEventListener('click', async (e) => {
             e.preventDefault();
@@ -280,11 +430,13 @@
                 couponInput.placeholder = result.message;
                 couponInput.classList.remove("input-error");
                 couponInput.classList.add("input-success");
+                messageBox.innerText = "";
             } else {
                 couponInput.value = "";
                 couponInput.placeholder = result.message;
                 couponInput.classList.remove("input-success");
                 couponInput.classList.add("input-error");
+                messageBox.innerText = result.message || "Invalid coupon";
             }
             console.log("Result:", result);
         })
