@@ -36,6 +36,7 @@ import WebsiteSetting from "./views/configuration/settings/WebsiteSetting";
 import StoreSetting from "./views/configuration/settings/StoreSetting";
 import FooterSetting from "./views/configuration/settings/FooterSetting";
 import SmtpSetting from "./views/configuration/settings/SmtpSetting";
+import CurrencySetting from "./views/configuration/settings/CurrencySetting";
 import Customer from "./views/users/customers/All";
 import CustomerCreate from "./views/users/customers/Create";
 import CustomerTrash from "./views/users/customers/Trash";
@@ -45,6 +46,7 @@ import MailLogsDetails from "./views/dashboardlogs/mailogs/Details";
 import NotFoundPage from "./pages/NotFoundPage";
 import ComingSoonPage from "./pages/ComingSoonPage";
 import Tages from "./views/configuration/masters/Tags";
+import Status from "./views/configuration/masters/Status";
 import Brands from "./views/configuration/masters/Brands";
 import Categories from "./views/configuration/masters/Categories";
 import Regions from "./views/configuration/masters/Regions";
@@ -157,6 +159,8 @@ const router = createBrowserRouter([
       { path: "/setting/store-setting", element: <StoreSetting /> },
       { path: "/setting/footer-setting", element: <FooterSetting /> },
       { path: "/setting/smtp-setting", element: <SmtpSetting /> },
+      { path: "/setting/currency-setting", element: <CurrencySetting /> },
+      { path: "/setting/currency-setting/:id/edit", element: <CurrencySetting /> },
 
       { path: "/master/regions", element: <Regions /> },
       { path: "/master/categories", element: <Categories /> },
@@ -165,6 +169,8 @@ const router = createBrowserRouter([
       { path: "/master/brands/:id/edit", element: <Brands /> },
       { path: "/master/tages", element: <Tages /> },
       { path: "/master/tages/:id/edit", element: <Tages /> },
+      { path: "/master/status", element: <Status /> },
+      { path: "/master/status/:id/edit", element: <Status /> },
 
       { path: "/support/support-ticket", element: <SupportTicket /> },
       {

@@ -9,6 +9,7 @@ import WishlistProvider from "@/utils/context/WishlistContext";
 import { QuickViewProvider } from "@/utils/context/QuickViewContext";
 import { QuickAddProvider } from "@/utils/context/QuickAddContext";
 import CartProvider from "@/utils/context/CartContext";
+import CurrencyProvider from "@/utils/context/CurrencyContext";
 
 import AskModel from "@/components/AskModel";
 import CompareModel from "@/components/CompareModel";
@@ -46,64 +47,67 @@ export default function RootLayout({ children }) {
       </head>
       <body>
         <AuthContextProvider>
-          <WishlistProvider>
-            <QuickViewProvider>
-            <QuickAddProvider>
-              <CartProvider>
-                <ScriptLoader />
-                <Header />
-                {children}
-                <SizeGuideModel />
-                <ShareModel />
-                <AskModel />
-                <CompareModel />
-                <QuickAddModel />
-                <QuickViewModel />
-                <Search />
-                <ShoppingCart />
-                <RegisterModel />
-                <SignInModel />
-                <NewsletterModel />
-                <Toaster position="top-right" />
-                <Footer />
-              </CartProvider>
-            </QuickAddProvider>
-            <Script
-              src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
-              integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
-              crossOrigin="anonymous"
-              strategy="beforeInteractive"
-            />
-            <Script
-              src="/assets/js/plugin/jquery.min.js"
-              strategy="beforeInteractive"
-            />
-            <Script
-              src="/assets/js/plugin/swiper-bundle.min.js"
-              strategy="afterInteractive"
-            />
-            <Script
-              src="/assets/js/plugin/bootstrap-select.min.js"
-              strategy="afterInteractive"
-            />
-            <Script
-              src="/assets/js/plugin/count-down.js"
-              strategy="afterInteractive"
-            />
-            <Script
-              src="/assets/js/plugin/infinityslide.js"
-              strategy="afterInteractive"
-            />
-            <Script
-              src="/assets/js/plugin/wow.min.js"
-              strategy="afterInteractive"
-            />
-            <Script src="/assets/js/carousel.js" strategy="afterInteractive" />
-            <Script src="/assets/js/main.js" strategy="afterInteractive" />
-          </QuickViewProvider>
-        </WishlistProvider>
+          <CurrencyProvider>
+            <WishlistProvider>
+              <QuickViewProvider>
+              <QuickAddProvider>
+                <CartProvider>
+                  <ScriptLoader />
+                  <Header />
+                  {children}
+                  <SizeGuideModel />
+                  <ShareModel />
+                  <AskModel />
+                  <CompareModel />
+                  <QuickAddModel />
+                  <QuickViewModel />
+                  <Search />
+                  <ShoppingCart />
+                  <RegisterModel />
+                  <SignInModel />
+                  <NewsletterModel />
+                  <Toaster position="top-right" />
+                  <Footer />
+                </CartProvider>
+              </QuickAddProvider>
+              <Script
+                src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+                integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+                crossOrigin="anonymous"
+                strategy="beforeInteractive"
+              />
+              <Script
+                src="/assets/js/plugin/jquery.min.js"
+                strategy="beforeInteractive"
+              />
+              <Script
+                src="/assets/js/plugin/swiper-bundle.min.js"
+                strategy="afterInteractive"
+              />
+              <Script
+                src="/assets/js/plugin/bootstrap-select.min.js"
+                strategy="afterInteractive"
+              />
+              <Script
+                src="/assets/js/plugin/count-down.js"
+                strategy="afterInteractive"
+              />
+              <Script
+                src="/assets/js/plugin/infinityslide.js"
+                strategy="afterInteractive"
+              />
+              <Script
+                src="/assets/js/plugin/wow.min.js"
+                strategy="afterInteractive"
+              />
+              <Script src="/assets/js/carousel.js" strategy="afterInteractive" />
+              <Script src="/assets/js/main.js" strategy="afterInteractive" />
+            </QuickViewProvider>
+          </WishlistProvider>
+        </CurrencyProvider>
       </AuthContextProvider>
     </body>
     </html>
   );
 }
+

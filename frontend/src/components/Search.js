@@ -4,9 +4,11 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import BasicProvider from "@/utils/BasicProvider";
 import { priceHelper, productUrl } from "@/utils/helpers/productHelper";
+import { useCurrency } from "@/utils/context/CurrencyContext";
 
 function Search() {
   const router = useRouter();
+  const { formatPrice } = useCurrency();
   const [query, setQuery] = useState("");
   const [results, setResults] = useState({ items: [], posts: [], categories: [] });
   const [loading, setLoading] = useState(false);
@@ -124,18 +126,18 @@ function Search() {
                               <a href={url} onClick={handleNavigation} className="name-product lh-20 fw-medium text-truncate-2 mb-1 d-block">
                                 {item.name}
                               </a>
-                              <div className="price-wrap">
-                                {sale_price && sale_price != null ? (
-                                  <>
-                                    <span className="price-new text-primary fw-semibold">${sale_price}</span>
-                                    {price && price != null && (
-                                      <span className="price-old text-caption-01 cl-text-3 ms-2" style={{ textDecoration: 'line-through' }}>${price}</span>
-                                    )}
-                                  </>
-                                ) : (
-                                  <span className="price-new text-primary fw-semibold">${price || '0.00'}</span>
-                                )}
-                              </div>
+                                <div className="price-wrap">
+                                  {sale_price && sale_price != null ? (
+                                    <>
+                                      <span className="price-new text-primary fw-semibold">{formatPrice(sale_price)}</span>
+                                      {price && price != null && (
+                                        <span className="price-old text-caption-01 cl-text-3 ms-2" style={{ textDecoration: 'line-through' }}>{formatPrice(price)}</span>
+                                      )}
+                                    </>
+                                  ) : (
+                                    <span className="price-new text-primary fw-semibold">{formatPrice(price || 0)}</span>
+                                  )}
+                                </div>
                             </div>
                           </div>
                         );

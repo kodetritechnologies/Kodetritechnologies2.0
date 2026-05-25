@@ -417,7 +417,7 @@ export const verifyCoupon = async (req, res) => {
   try {
     const { couponCode } = req.body;
     const customerId = new mongoose.Types.ObjectId(
-      "6945fa14ba3f1cfc95b588fa" // req.customer._id
+      req.customer?._id || "6945fa14ba3f1cfc95b588fa"
     );
 
     /* ------------------------------------
@@ -425,9 +425,7 @@ export const verifyCoupon = async (req, res) => {
     ------------------------------------ */
     const couponClaim = await CoupanClaim.findOne({
       couponCode,
-      customer: new mongoose.Types.ObjectId(
-        "6945fa14ba3f1cfc95b588fa" // req.customer._id
-      ),
+      customer: customerId,
       deletedAt: null,
     });
 
@@ -481,7 +479,7 @@ export const verifyCoupon = async (req, res) => {
       {
         $lookup: {
           from: "items",
-          localField: "item",
+          localField: "itemId",
           foreignField: "_id",
           as: "item",
         },
@@ -528,11 +526,13 @@ export const verifyCoupon = async (req, res) => {
     // 🟢 CATEGORY LEVEL
     if (coupon.type === "category") {
       cartItems.forEach((item) => {
-        if (
-          coupon.categories.some(
-            (cat) => cat._id.toString() === item.item.category.toString()
+        const itemCategories = item.item.categories || [];
+        const hasMatchingCategory = itemCategories.some(
+          (itemCatId) => coupon.categories.some(
+            (couponCat) => couponCat._id.toString() === itemCatId.toString()
           )
-        ) {
+        );
+        if (hasMatchingCategory) {
           eligibleAmount += item.itemTotal;
         }
       });

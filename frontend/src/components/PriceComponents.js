@@ -2,10 +2,12 @@
 
 import { useMemo } from "react"
 import { useParams } from "next/navigation"
+import { useCurrency } from "@/utils/context/CurrencyContext"
 
 export default function PriceComponents({ data }) {
 
     const { id } = useParams()
+    const { formatPrice } = useCurrency()
 
     const variants = data?.varients || []
 
@@ -28,7 +30,7 @@ export default function PriceComponents({ data }) {
         <div className="product-infor-price mb-12">
 
             <h4 className="price-on-sale">
-                ₹{finalPrice}
+                {formatPrice(finalPrice)}
             </h4>
 
             {salePrice && (
@@ -36,7 +38,7 @@ export default function PriceComponents({ data }) {
                     <div className="br-line type-vertical"></div>
 
                     <p className="cl-text-3 text-decoration-line-through">
-                        ₹{regularPrice}
+                        {formatPrice(regularPrice)}
                     </p>
 
                     <span className="badge-sale text-white fw-semibold text-caption-02">

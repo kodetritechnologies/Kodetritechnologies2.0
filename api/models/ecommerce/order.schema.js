@@ -7,10 +7,9 @@ const orderSchema = new mongoose.Schema(
       type: String,
     },
     currency: {
-      type: String,
-    },
-    currency_symbol: {
-      type: String,
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Currency",
+      default: null,
     },
     subtotal: {
       type: Number,
@@ -31,12 +30,15 @@ const orderSchema = new mongoose.Schema(
     transiction_id: {
       type: String,
     },
-    status: {
-      type: String,
-    },
-    status_id: {
+    payment_status: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Status",
+      default: null,
+    },
+    order_status: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Status",
+      default: null,
     },
     address: {
       type: mongoose.Schema.Types.ObjectId,
@@ -65,13 +67,17 @@ const orderSchema = new mongoose.Schema(
 
 orderSchema.pre("find", function (next) {
   this.populate("customer");
-  this.populate("");
+  this.populate("currency");
+  this.populate("order_status");
+  this.populate("payment_status");
   this.populate("items");
   next();
 });
 orderSchema.pre("findOne", function (next) {
   this.populate("customer");
-  this.populate("");
+  this.populate("currency");
+  this.populate("order_status");
+  this.populate("payment_status");
   this.populate("items");
   next();
 });

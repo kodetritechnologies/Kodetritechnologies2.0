@@ -37,7 +37,7 @@ import {
   removeToCartCustomer,
   updateCartCustomer,
 } from "../../controllers/ecommerce/cart.controller.js";
-import { createPayment, placeOrder } from "../../controllers/ecommerce/order.controller.js";
+import { placeOrder, getPaymentMethods, verifyPayment, razorpayWebhook, getOrderDetails, getPublicStoreSettings } from "../../controllers/ecommerce/order.controller.js";
 
 router.get("/reviews", customerAuthMiddleware, getCustomerReview);
 router.post("/reviews/create", customerAuthMiddleware, createCustomerReview);
@@ -60,7 +60,7 @@ router.get("/global-search", globalSearch);
 router.get("/coupan/all", customerAuthMiddleware, getAllCoupan);
 router.get("/customer/coupan", customerAuthMiddleware, getCustomerCoupan);
 router.post("/coupan/claim", customerAuthMiddleware, claimCoupan);
-router.post("/verify-coupon", verifyCoupon);
+router.post("/verify-coupon", customerAuthMiddleware, verifyCoupon);
 
 // Wishlist
 
@@ -89,7 +89,12 @@ router.delete("/cart/delete/:id", customerAuthMiddleware, removeToCartCustomer);
 
 // Order
 
-router.get("/order/payment", createPayment);
+router.get("/order/payment-methods", getPaymentMethods);
+
 router.post("/order/place", placeOrder);
+router.post("/order/verify-payment", verifyPayment);
+router.post("/order/razorpay/webhook", razorpayWebhook);
+router.get("/order/detail/:id", getOrderDetails);
+router.get("/store-settings", getPublicStoreSettings);
 
 export default router;

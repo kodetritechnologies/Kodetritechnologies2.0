@@ -5,9 +5,11 @@ import WishlistButton from "@/components/WishlistButton";
 import AddToCartButton from "./AddToCartButton";
 import { useState, useMemo, useEffect } from "react";
 import { productUrl } from "@/utils/helpers/productHelper";
+import { useCurrency } from "@/utils/context/CurrencyContext";
 
 function QuickViewModel() {
   const { quickViewProduct: product } = useQuickView();
+  const { formatPrice } = useCurrency();
 
   const variants = product?.varients || [];
 
@@ -195,10 +197,10 @@ function QuickViewModel() {
                   )}
                 </div>
                 <div className="product-infor-price mb-12">
-                  <h4 className="price-on-sale">${finalPrice?.toFixed(2)}</h4>
+                  <h4 className="price-on-sale">{formatPrice(finalPrice)}</h4>
                   <div className="br-line type-vertical"></div>
                   {hasSale && (
-                    <p className="cl-text-3 text-decoration-line-through">${originalPrice?.toFixed(2)}</p>
+                    <p className="cl-text-3 text-decoration-line-through">{formatPrice(originalPrice)}</p>
                   )}
                   {hasSale && (
                     <span className="badge-sale text-white fw-semibold text-caption-02">SALE</span>
@@ -290,7 +292,7 @@ function QuickViewModel() {
                       >
                         Add to Cart
                         <span className="d-none d-sm-block d-md-none d-lg-block">&nbsp;-&nbsp;</span>
-                        <span className="price-add d-none d-sm-block d-md-none d-lg-block">${(finalPrice * quantity).toFixed(2)}</span>
+                        <span className="price-add d-none d-sm-block d-md-none d-lg-block">{formatPrice(finalPrice * quantity)}</span>
                       </AddToCartButton>
                     </div>
                     <div className="flex-shrink-0">

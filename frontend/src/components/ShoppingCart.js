@@ -1,10 +1,12 @@
 "use client";
 import React from "react";
 import { useCart } from "@/utils/context/CartContext";
+import { useCurrency } from "@/utils/context/CurrencyContext";
 import Link from "next/link";
 
 function ShoppingCart() {
   const { cart, removeFromCart, updateQuantity } = useCart();
+  const { formatPrice } = useCurrency();
 
   // Helper to safely extract name, image, price, and variant info from guest vs authenticated format
   const getProductInfo = (item) => {
@@ -149,7 +151,7 @@ function ShoppingCart() {
                                 </div>
                                 <div className="d-flex align-items-center gap-1">
                                   <span className="text-caption-01 cl-text-3 fw-normal">x</span>
-                                  <span className="price tf-mini-card-price">${price.toFixed(2)}</span>
+                                  <span className="price tf-mini-card-price">{formatPrice(price)}</span>
                                 </div>
                               </div>
                             </div>
@@ -165,7 +167,7 @@ function ShoppingCart() {
                       <h5 className="text-total d-flex align-content-center justify-content-between">
                         <span className="subtotal">Subtotal</span>
                         <span className="total-price tf-totals-total-value">
-                          ${subtotal.toFixed(2)}
+                          {formatPrice(subtotal)}
                         </span>
                       </h5>
                     </div>

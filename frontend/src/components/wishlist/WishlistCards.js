@@ -2,11 +2,13 @@
 import React from "react";
 import { useWishlist } from "@/utils/context/WishlistContext";
 import { priceHelper, productUrl } from "@/utils/helpers/productHelper";
+import { useCurrency } from "@/utils/context/CurrencyContext";
 import Link from "next/link";
 import QuickViewButton from "@/components/QuickViewButton";
 
 function WishlistCards() {
   const { wishlist, toggleWishlist } = useWishlist();
+  const { formatPrice } = useCurrency();
 
   if (!wishlist || wishlist.length === 0) {
     return (
@@ -114,15 +116,15 @@ function WishlistCards() {
                 {sale_price ? (
                   <>
                     <span className="price-new text-primary fw-semibold">
-                      ${sale_price}
+                      {formatPrice(sale_price)}
                     </span>
                     <span className="price-old text-caption-01 cl-text-3">
-                      ${price}
+                      {formatPrice(price)}
                     </span>
                   </>
                 ) : (
                   <span className="price-new text-primary fw-semibold">
-                    ${price}
+                    {formatPrice(price)}
                   </span>
                 )}
               </div>

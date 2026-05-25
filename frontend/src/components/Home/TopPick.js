@@ -4,6 +4,7 @@ import Link from "next/link";
 import QuickViewButton from "@/components/QuickViewButton";
 import WishlistButton from "@/components/WishlistButton";
 import QuickAddButton from "@/components/QuickAddButton";
+import Price from "@/components/Price";
 
 async function TopPick() {
   const serverProvider = await serviceProvider();
@@ -170,16 +171,16 @@ async function TopPick() {
                       <div className="price-wrap">
                         {sale_price && sale_price != null ? (
                           <span className="price-new text-primary fw-semibold">
-                            ${sale_price}
+                            <Price amount={sale_price} />
                           </span>
                         ) : (
                           <span className="price-new text-primary fw-semibold">
-                            ${price}
+                            <Price amount={price} />
                           </span>
                         )}
                         {price && price != null && (
                           <span className="price-old text-caption-01 cl-text-3">
-                            ${price}
+                            <Price amount={price} />
                           </span>
                         )}
                       </div>

@@ -81,7 +81,8 @@ async function page() {
                   <th>Order</th>
                   <th>Products</th>
                   <th>Pricing</th>
-                  <th>Status</th>
+                  <th>Order Status</th>
+                  <th>Payment Status</th>
                 </tr>
               </thead>
               <tbody>
@@ -125,14 +126,26 @@ async function page() {
                           </div>
                         </td>
                         <td className="tb-order_price fw-medium ">
-                          {order.currency_symbol || "₹"}
+                          {order.currency?.symbol || "₹"}
                           {order.total?.toFixed(2)}
                         </td>
                         <td>
                           <div
-                            className={`tb-order_status text-label stt-${order.status?.toLowerCase().replace(" ", "-")}`}
+                            className={`tb-order_status text-label stt-${(order.order_status?.name || "Pending").toLowerCase().replace(" ", "-")}`}
                           >
-                            {order.status || "Pending"}
+                            {order.order_status?.name || "Pending"}
+                          </div>
+                        </td>
+                        <td>
+                          <div
+                            className={`tb-order_status text-label stt-${(order.paymentStatus || order.status || "Pending").toLowerCase().replace(" ", "-")}`}
+                            style={{
+                              backgroundColor: (order.paymentStatus === "Paid" || order.status === "Paid") ? "#d1e7dd" : "#fff3cd",
+                              color: (order.paymentStatus === "Paid" || order.status === "Paid") ? "#0f5132" : "#664d03",
+                              borderColor: (order.paymentStatus === "Paid" || order.status === "Paid") ? "#badbcc" : "#ffecb5"
+                            }}
+                          >
+                            {order.paymentStatus || order.status || "Pending"}
                           </div>
                         </td>
                       </tr>

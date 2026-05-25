@@ -12,12 +12,15 @@ export default function CartProvider({ children }) {
   const basicProvider = BasicProvider();
   const { user } = useContext(AuthContext);
   const [cart, setCart] = useState([]);
+  const [cartTotal, setCartTotal] = useState(0);
   const [loading, setLoading] = useState(false);
 
   const fetchCart = async () => {
     if (!user) {
       const localCart = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY)) || [];
       setCart(localCart);
+      const localTotal = localCart.reduce((sum, item) => sum + (item.price || 0) * (item.quantity || 1), 0);
+      setCartTotal(localTotal);
       return;
     }
 
@@ -26,6 +29,7 @@ export default function CartProvider({ children }) {
       const response = await basicProvider.getMethod("public/ecommerce/cart");
       if (response.status === "success") {
         setCart(response.data[0]?.items || []);
+        setCartTotal(response.data[0]?.totalAmount || 0);
       }
     } catch (error) {
       console.error("Error fetching cart:", error);
@@ -63,6 +67,8 @@ export default function CartProvider({ children }) {
 
       localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(localCart));
       setCart([...localCart]);
+      const localTotal = localCart.reduce((sum, item) => sum + (item.price || 0) * (item.quantity || 1), 0);
+      setCartTotal(localTotal);
       toast.success("Item added to cart");
       return;
     }
@@ -111,6 +117,8 @@ export default function CartProvider({ children }) {
       const newCart = localCart.filter((item) => !(item.itemId === id || item._id === id));
       localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(newCart));
       setCart(newCart);
+      const localTotal = newCart.reduce((sum, item) => sum + (item.price || 0) * (item.quantity || 1), 0);
+      setCartTotal(localTotal);
       toast.success("Item removed from cart");
       return;
     }
@@ -136,6 +144,8 @@ export default function CartProvider({ children }) {
         item.quantity += change;
         localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(localCart));
         setCart([...localCart]);
+        const localTotal = localCart.reduce((sum, item) => sum + (item.price || 0) * (item.quantity || 1), 0);
+        setCartTotal(localTotal);
       }
       return;
     }
@@ -154,7 +164,10 @@ export default function CartProvider({ children }) {
 
   const clearLocalStorageCart = () => {
     localStorage.removeItem(LOCAL_STORAGE_KEY);
-    if (!user) setCart([]);
+    if (!user) {
+      setCart([]);
+      setCartTotal(0);
+    }
   };
 
   const getLocalStorageCart = () => {
@@ -165,6 +178,7 @@ export default function CartProvider({ children }) {
     <CartContext.Provider
       value={{
         cart,
+        cartTotal,
         loading,
         addToCart,
         removeFromCart,

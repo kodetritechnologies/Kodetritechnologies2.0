@@ -3,10 +3,12 @@ import React, { useState, useEffect, useMemo } from "react";
 import { useQuickAdd } from "@/utils/context/QuickAddContext";
 import AddToCartButton from "./AddToCartButton";
 import { priceHelper, productUrl } from "@/utils/helpers/productHelper";
+import { useCurrency } from "@/utils/context/CurrencyContext";
 import Link from "next/link";
 
 function QuickAddModel() {
   const { quickAddProduct } = useQuickAdd();
+  const { formatPrice } = useCurrency();
 
   const variants = quickAddProduct?.varients || [];
   const isSimple = quickAddProduct?.type === "simple" || !quickAddProduct?.type || variants.length === 0;
@@ -137,15 +139,15 @@ function QuickAddModel() {
                   {parsedSalePrice > 0 ? (
                     <>
                       <span className="price-new text-primary fw-semibold price-on-sale">
-                        ${parsedSalePrice.toFixed(2)}
+                        {formatPrice(parsedSalePrice)}
                       </span>
                       <span className="price-old text-caption-01 cl-text-3 ms-2">
-                        ${parsedPrice.toFixed(2)}
+                        {formatPrice(parsedPrice)}
                       </span>
                     </>
                   ) : (
                     <span className="price-new text-primary fw-semibold">
-                      ${parsedPrice.toFixed(2)}
+                      {formatPrice(parsedPrice)}
                     </span>
                   )}
                 </div>
@@ -242,7 +244,7 @@ function QuickAddModel() {
                   }}
                   className="btn-action-price tf-btn type-xl animate-btn w-100"
                 >
-                  Add to Cart - ${(currentPrice * quantity).toFixed(2)}
+                  Add to Cart - {formatPrice(currentPrice * quantity)}
                 </AddToCartButton>
               </div>
             </div>

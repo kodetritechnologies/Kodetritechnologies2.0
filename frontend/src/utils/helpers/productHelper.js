@@ -12,7 +12,6 @@ export function priceHelper(product, variant = null) {
       sale_price: product?.sale_price,
     };
   } else {
-    // For variable products without a specific variant selected, show the first variant's price
     return {
       price: product?.varients?.[0]?.price || product?.price,
       sale_price: product?.varients?.[0]?.sale_price || product?.sale_price,
@@ -20,16 +19,32 @@ export function priceHelper(product, variant = null) {
   }
 }
 
+/**
+ * Format a price with a currency symbol.
+ * In CLIENT components, prefer: const { formatPrice } = useCurrency()
+ * This helper is for SERVER components or places without context access.
+ *
+ * @param {number} amount - the price to format
+ * @param {string} symbol - currency symbol (e.g. "$", "₹")
+ * @returns {string} e.g. "$1,299.00"
+ */
+export function formatPrice(amount, symbol = "") {
+  if (amount === null || amount === undefined) return "";
+  const formatted = Number(amount).toLocaleString("en-US", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
+  return `${symbol}${formatted}`;
+}
+
+
 export function productUrl(product, variant = null) {
   if (!product) return "#";
-  
+
   if (product.type == "simple") {
     return `/shop/${product.slug}`;
   } else {
-    // If we have a specific variant, link to it if the route supports it, 
-    // or just link to the product. For now, following existing pattern.
     const variantSlug = variant?.slug || product.varients?.[0]?.slug;
     return `/shop/${product.slug}/${variantSlug}`;
   }
 }
-

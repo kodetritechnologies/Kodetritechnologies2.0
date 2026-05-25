@@ -52,7 +52,22 @@ import {
   createSmtp,
   getSmtp,
 } from "../../controllers/configuration/setting/smtp.controller.js";
-import { getStatusByType } from "../../controllers/configuration/master/status.controller.js";
+import {
+  getStatusByType,
+  createStatus,
+  deleteStatus,
+  getStatus,
+  getStatusById,
+  multiDeleteStatus,
+  updateStatus,
+} from "../../controllers/configuration/master/status.controller.js";
+import {
+  createCurrency,
+  getCurrencies,
+  getCurrencyById,
+  updateCurrency,
+  deleteCurrency,
+} from "../../controllers/configuration/setting/currency.controller.js";
 
 // Setting Routes
 
@@ -73,6 +88,13 @@ router.post("/store/create", adminAuthMiddleware, createStore);
 
 router.get("/smtp", adminAuthMiddleware, getSmtp);
 router.post("/smtp/create", adminAuthMiddleware, createSmtp);
+
+// Currency
+router.get("/currency", adminAuthMiddleware, getCurrencies);
+router.get("/currency/byId/:id", adminAuthMiddleware, getCurrencyById);
+router.post("/currency/create", adminAuthMiddleware, createCurrency);
+router.patch("/currency/update/:id", adminAuthMiddleware, updateCurrency);
+router.delete("/currency/delete/:id", adminAuthMiddleware, deleteCurrency);
 
 // Master Routes
 
@@ -131,8 +153,24 @@ router.patch(
 router.delete("/tages/delete/:id", adminAuthMiddleware, deleteTages);
 router.post("/tages/multi-delete", adminAuthMiddleware, multiDeleteTages);
 
-// ststus
+// status
 
+router.get("/status", adminAuthMiddleware, getStatus);
+router.get("/status/get/:id", adminAuthMiddleware, getStatusById);
 router.get("/status/type/:type", adminAuthMiddleware, getStatusByType);
+router.post(
+  "/status/create",
+  uploadMiddleware,
+  adminAuthMiddleware,
+  createStatus
+);
+router.patch(
+  "/status/update/:id",
+  uploadMiddleware,
+  adminAuthMiddleware,
+  updateStatus
+);
+router.delete("/status/delete/:id", adminAuthMiddleware, deleteStatus);
+router.post("/status/multi-delete", adminAuthMiddleware, multiDeleteStatus);
 
 export default router;

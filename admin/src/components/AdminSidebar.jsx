@@ -564,6 +564,11 @@ function AdminSidebar() {
                   <span>SMTP Settings</span>
                 </NavLink>
               </li>
+              <li>
+                <NavLink to="setting/currency-setting" className="customeRoute">
+                  <span>Currency Settings</span>
+                </NavLink>
+              </li>
             </ul>
             <li
               onClick={() => {
@@ -608,6 +613,11 @@ function AdminSidebar() {
               <li>
                 <NavLink to="master/tages" className="customeRoute">
                   <span>Tages</span>
+                </NavLink>
+              </li>
+              <li>
+                <NavLink to="master/status" className="customeRoute">
+                  <span>Status</span>
                 </NavLink>
               </li>
             </ul>
