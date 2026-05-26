@@ -1,6 +1,24 @@
+"use client";
 import React from "react";
+import { useRouter } from "next/navigation";
 
-export default function CategoryFilter() {
+export default function CategoryFilter({ categories = [], searchParams = {} }) {
+  const router = useRouter();
+  const currentCategory = searchParams.category || "";
+
+  const handleCategoryClick = (e, slug) => {
+    e.preventDefault();
+    const params = new URLSearchParams(searchParams);
+    if (currentCategory === slug) {
+      params.delete("category");
+    } else {
+      params.set("category", slug);
+    }
+    // reset page to 1 when filter changes
+    params.delete("page");
+    router.push(`?${params.toString()}`, { scroll: false });
+  };
+
   return (
     <div className="widget-facet">
       <div
@@ -16,19 +34,14 @@ export default function CategoryFilter() {
       </div>
       <div id="category" className="collapse show">
         <ul className="collapse-body filter-group-check group-category">
-          {[
-            { name: "Bags", count: 112 },
-            { name: "Booking", count: 32 },
-            { name: "Clothing", count: 42 },
-            { name: "Women", count: 65 },
-            { name: "Men", count: 13 },
-            { name: "Shoes", count: 52 },
-            { name: "Uncategorized", count: 14 },
-          ].map((cat, idx) => (
-            <li className="list-item" key={idx}>
-              <a href="shop-default.html" className="label link">
+          {categories.map((cat, idx) => (
+            <li className="list-item" key={cat._id || idx}>
+              <a
+                href={`?category=${cat.slug}`}
+                className={`label link ${currentCategory === cat.slug ? "text-primary fw-bold" : ""}`}
+                onClick={(e) => handleCategoryClick(e, cat.slug)}
+              >
                 <span className="cate-text">{cat.name}</span>
-                <span className="count">({cat.count})</span>
               </a>
             </li>
           ))}

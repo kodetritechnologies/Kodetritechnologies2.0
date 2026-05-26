@@ -1,6 +1,32 @@
+"use client";
 import React from "react";
+import { useRouter } from "next/navigation";
 
-export default function BrandFilter() {
+export default function BrandFilter({ searchParams = {}, brands = [] }) {
+  const router = useRouter();
+  const currentBrands = searchParams.brand ? searchParams.brand.split(',') : [];
+
+  const handleBrandChange = (brandId) => {
+    const params = new URLSearchParams(searchParams);
+    let updatedBrands = [...currentBrands];
+    if (updatedBrands.includes(brandId)) {
+      updatedBrands = updatedBrands.filter(id => id !== brandId);
+    } else {
+      updatedBrands.push(brandId);
+    }
+    
+    if (updatedBrands.length > 0) {
+      params.set("brand", updatedBrands.join(','));
+    } else {
+      params.delete("brand");
+    }
+    // reset page to 1 when filter changes
+    params.delete("page");
+    router.push(`?${params.toString()}`, { scroll: false });
+  };
+
+  if (!brands || brands.length === 0) return null;
+
   return (
     <div className="widget-facet">
       <div
@@ -16,22 +42,18 @@ export default function BrandFilter() {
       </div>
       <div id="brand" className="collapse show">
         <ul className="collapse-body filter-group-check">
-          {[
-            { id: "nike", name: "Nike", count: 112 },
-            { id: "lv", name: "Louis Vuitton", count: 32 },
-            { id: "hermes", name: "Hermes", count: 42 },
-            { id: "gucci", name: "Gucci", count: 13, disabled: true },
-            { id: "zalando", name: "Zalando", count: 54 },
-            { id: "adidas", name: "Adidas", count: 93, disabled: true },
-          ].map((brand) => (
+          {brands.map((brand) => (
             <li className={`list-item ${brand.disabled ? "disabled" : ""}`} key={brand.id}>
               <input
-                type="radio"
+                type="checkbox"
                 name="brand"
                 className="tf-check style-2"
-                id={brand.id}
+                id={`brand-${brand.id}`}
+                checked={currentBrands.includes(brand.id)}
+                onChange={() => !brand.disabled && handleBrandChange(brand.id)}
+                disabled={brand.disabled}
               />
-              <label htmlFor={brand.id} className="label">
+              <label htmlFor={`brand-${brand.id}`} className="label">
                 <span className="brand-text">{brand.name}</span>
                 <span className="count">({brand.count})</span>
               </label>

@@ -1,4 +1,5 @@
 import { serviceProvider } from "@/utils/serviceProvider";
+import Link from "next/link";
 
 async function page() {
   const { getMethod } = await serviceProvider();
@@ -75,7 +76,7 @@ async function page() {
         <div className="account-my_recent">
           <h6 className="title-case">Recent Orders</h6>
           <div className="overflow-auto">
-            <table className="table-my_recent">
+            <table className="table-my_recent w-100">
               <thead>
                 <tr>
                   <th>Order</th>
@@ -95,35 +96,37 @@ async function page() {
                           {order.order_no || order._id.slice(-8)}
                         </td>
                         <td>
-                          <div className="tb-order_product">
-                            <a href="#" className="img-prd">
-                              <img
-                                loading="lazy"
-                                width="48"
-                                height="48"
-                                src={
-                                  firstItem?.featured_image?.url ||
-                                  "/assets/images/product/square/product-1_2.jpg"
-                                }
-                                alt={firstItem?.name || "Product"}
-                              />
-                            </a>
-                            <div className="infor-prd">
-                              <a
-                                href="#"
-                                className="prd_name link fw-medium lh-24"
-                              >
-                                {firstItem?.name || "Unknown Product"}
-                                {order.items?.length > 1 &&
-                                  ` +${order.items.length - 1} more`}
-                              </a>
-                              <p className="prd_type cl-text-2 text-caption-01">
-                                {firstItem?.categories
-                                  ?.map((c) => c.name)
-                                  .join(", ") || "General"}
-                              </p>
+                          {firstItem && (
+                            <div className="tb-order_product d-flex align-items-center">
+                              {firstItem.featured_image?.url && (
+                                <Link href={`/product-detail/${firstItem.slug || firstItem._id}`} className="img-prd me-3 flex-shrink-0">
+                                  <img
+                                    loading="lazy"
+                                    width="48"
+                                    height="48"
+                                    className="rounded border"
+                                    style={{ objectFit: "cover" }}
+                                    src={firstItem.featured_image.url}
+                                    alt={firstItem.name || firstItem.title || "Product"}
+                                  />
+                                </Link>
+                              )}
+                              <div className="infor-prd flex-grow-1" style={{ minWidth: 0 }}>
+                                <Link
+                                  href={`/product-detail/${firstItem.slug || firstItem._id}`}
+                                  className="prd_name link fw-medium lh-24 d-block text-truncate"
+                                  title={firstItem.name || firstItem.title || "Product"}
+                                >
+                                  {firstItem.name || firstItem.title || "Unknown Product"}
+                                </Link>
+                                {order.items?.length > 1 && (
+                                  <div className="text-muted small mt-1">
+                                    + {order.items.length - 1} more item{order.items.length - 1 !== 1 ? 's' : ''}
+                                  </div>
+                                )}
+                              </div>
                             </div>
-                          </div>
+                          )}
                         </td>
                         <td className="tb-order_price fw-medium ">
                           {order.currency?.symbol || "₹"}

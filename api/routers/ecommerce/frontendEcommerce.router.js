@@ -37,7 +37,7 @@ import {
   removeToCartCustomer,
   updateCartCustomer,
 } from "../../controllers/ecommerce/cart.controller.js";
-import { placeOrder, getPaymentMethods, verifyPayment, razorpayWebhook, getOrderDetails, getPublicStoreSettings } from "../../controllers/ecommerce/order.controller.js";
+import { placeOrder, getPaymentMethods, verifyPayment, razorpayWebhook, getOrderDetails, getPublicStoreSettings, getCustomerOrders } from "../../controllers/ecommerce/order.controller.js";
 
 router.get("/reviews", customerAuthMiddleware, getCustomerReview);
 router.post("/reviews/create", customerAuthMiddleware, createCustomerReview);
@@ -89,6 +89,7 @@ router.delete("/cart/delete/:id", customerAuthMiddleware, removeToCartCustomer);
 
 // Order
 
+router.get("/order", customerAuthMiddleware, getCustomerOrders);
 router.get("/order/payment-methods", getPaymentMethods);
 
 router.post("/order/place", placeOrder);

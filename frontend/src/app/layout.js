@@ -70,42 +70,42 @@ export default function RootLayout({ children }) {
                   <Footer />
                 </CartProvider>
               </QuickAddProvider>
-              <Script
-                src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
-                integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
-                crossOrigin="anonymous"
-                strategy="beforeInteractive"
-              />
-              <Script
-                src="/assets/js/plugin/jquery.min.js"
-                strategy="beforeInteractive"
-              />
-              <Script
-                src="/assets/js/plugin/swiper-bundle.min.js"
-                strategy="afterInteractive"
-              />
-              <Script
-                src="/assets/js/plugin/bootstrap-select.min.js"
-                strategy="afterInteractive"
-              />
-              <Script
-                src="/assets/js/plugin/count-down.js"
-                strategy="afterInteractive"
-              />
-              <Script
-                src="/assets/js/plugin/infinityslide.js"
-                strategy="afterInteractive"
-              />
-              <Script
-                src="/assets/js/plugin/wow.min.js"
-                strategy="afterInteractive"
-              />
-              <Script src="/assets/js/carousel.js" strategy="afterInteractive" />
-              <Script src="/assets/js/main.js" strategy="afterInteractive" />
             </QuickViewProvider>
           </WishlistProvider>
         </CurrencyProvider>
       </AuthContextProvider>
+      <Script
+        src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+        crossOrigin="anonymous"
+        strategy="beforeInteractive"
+      />
+      <Script
+        src="/assets/js/plugin/jquery.min.js"
+        strategy="beforeInteractive"
+      />
+      <Script
+        src="/assets/js/plugin/swiper-bundle.min.js"
+        strategy="afterInteractive"
+      />
+      <Script
+        src="/assets/js/plugin/bootstrap-select.min.js"
+        strategy="afterInteractive"
+      />
+      <Script
+        src="/assets/js/plugin/count-down.js"
+        strategy="afterInteractive"
+      />
+      <Script
+        src="/assets/js/plugin/infinityslide.js"
+        strategy="afterInteractive"
+      />
+      <Script
+        src="/assets/js/plugin/wow.min.js"
+        strategy="afterInteractive"
+      />
+      <Script src="/assets/js/carousel.js" strategy="afterInteractive" />
+      <Script src="/assets/js/main.js" strategy="afterInteractive" />
     </body>
     </html>
   );

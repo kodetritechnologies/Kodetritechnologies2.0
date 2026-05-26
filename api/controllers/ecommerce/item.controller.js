@@ -13,10 +13,7 @@ import Categories from "../../models/configuration/master/categories.schema.js";
 
 export const getItems = async (req, res) => {
   try {
-    const { _id } = req.admin;
     const query = GenerateSearchQuery(req, {
-      admin: _id,
-
       deletedAt: null,
     });
     const options = generateOptions(req);
@@ -41,10 +38,7 @@ export const getItems = async (req, res) => {
 
 export const getTrashItem = async (req, res) => {
   try {
-    const { _id } = req.admin;
     const query = GenerateSearchQuery(req, {
-      admin: _id,
-
       deletedAt: { $ne: null },
     });
     const options = generateOptions(req);
@@ -66,11 +60,9 @@ export const getTrashItem = async (req, res) => {
 
 export const getItemByID = async (req, res) => {
   try {
-    const { _id } = req.admin;
     const { id } = req.params;
     const query = {
       _id: id,
-      admin: _id,
     };
 
     const response = await Item.findOne(query);
@@ -90,7 +82,6 @@ export const getItemByID = async (req, res) => {
 
 export const createItem = async (req, res) => {
   try {
-    const { _id } = req.admin;
     const data = req.body;
 
     data.slug = await slugGenerator(data?.name, Item);
@@ -105,7 +96,6 @@ export const createItem = async (req, res) => {
         slug: slug,
         type: "item",
         values: data?.faqs?.values,
-        admin: _id,
       };
 
       const faqs = await Faq.create(faqPayload);
@@ -122,7 +112,6 @@ export const createItem = async (req, res) => {
 
     const item = await Item.create({
       ...data,
-      admin: _id,
     });
 
     if (data.type === "variants" && Array.isArray(variantsData)) {
@@ -161,14 +150,11 @@ export const createItem = async (req, res) => {
 
 export const updateItem = async (req, res) => {
   try {
-    const { _id } = req.admin;
     const { id } = req.params;
     const data = req.body;
     const query = {
       _id: id,
-      admin: _id,
     };
-    // data.slug = await slugGenerator(data?.name, Item);
     if (data?.faqs && data?.faqs?._id) {
       const faqPayload = {
         values: data.faqs.values,
@@ -185,7 +171,6 @@ export const updateItem = async (req, res) => {
         const faqPayload = {
           slug: slug,
           values: data?.faqs?.values,
-          admin: _id,
         };
         const faqs = await Faq.create(faqPayload);
         data.faqs = faqs?._id;
@@ -251,8 +236,7 @@ export const updateItem = async (req, res) => {
 export const deleteItem = async (req, res) => {
   try {
     const { id } = req.params;
-    const { _id } = req.admin;
-    const query = { _id: id, admin: _id, deletedAt: { $ne: null } };
+    const query = { _id: id, deletedAt: { $ne: null } };
 
     const item = await Item.findById(id);
 
@@ -290,8 +274,8 @@ export const deleteItem = async (req, res) => {
 export const trashItem = async (req, res) => {
   try {
     const { id } = req.params;
-    const { _id } = req.admin;
-    const query = { _id: id, admin: _id, deletedAt: null };
+
+    const query = { _id: id, deletedAt: null };
     const deleteItem = await Item.findOne(query);
 
     if (!deleteItem) {
@@ -324,11 +308,8 @@ export const trashItem = async (req, res) => {
 
 export const multiDeleteItem = async (req, res) => {
   try {
-    const { _id } = req.admin;
     const ids = req.body;
     const query = {
-      admin: _id,
-
       deletedAt: { $ne: null },
       _id: { $in: ids },
     };
@@ -371,11 +352,8 @@ export const multiDeleteItem = async (req, res) => {
 
 export const multiTrashItem = async (req, res) => {
   try {
-    const { _id } = req.admin;
     const ids = req.body;
     const query = {
-      admin: _id,
-
       deletedAt: null,
       _id: { $in: ids },
     };
@@ -408,8 +386,8 @@ export const multiTrashItem = async (req, res) => {
 export const restoreTrashItem = async (req, res) => {
   try {
     const { id } = req.params;
-    const { _id } = req.admin;
-    const query = { _id: id, admin: _id, deletedAt: { $ne: null } };
+
+    const query = { _id: id, deletedAt: { $ne: null } };
     const Items = await Item.findOne(query);
     if (!Items) {
       return res.status(404).json({
@@ -435,8 +413,6 @@ export const restoreTrashItem = async (req, res) => {
 
 export const itemsCounts = async (req, res) => {
   try {
-    const { _id } = req.admin;
-
     const response = await Item.aggregate([
       {
         $match: {
@@ -490,7 +466,17 @@ export const itemsCounts = async (req, res) => {
 
 export const getPublicItems = async (req, res) => {
   try {
-    const { tranding, hot, featured } = req?.query;
+    const {
+      tranding,
+      hot,
+      featured,
+      category,
+      brand,
+      color,
+      size,
+      minPrice,
+      maxPrice,
+    } = req?.query;
     const query = {
       deletedAt: null,
     };
@@ -506,6 +492,83 @@ export const getPublicItems = async (req, res) => {
     if (hot == "true" || hot == true) {
       query.hot = true;
     }
+
+    if (category) {
+      const cat = await Categories.findOne({ slug: category });
+      if (cat) {
+        query.categories = { $in: [cat._id] };
+      }
+    }
+
+    if (brand) {
+      const brandIds = brand.split(",").filter((id) => isValidObjectId(id));
+      if (brandIds.length > 0) {
+        query.brand = { $in: brandIds };
+      }
+    }
+
+    let itemIdsFromVariants = null;
+    let variantQueryNeeded = false;
+    const variantQuery = {};
+    const variantConditions = [];
+
+    if (color) {
+      variantQueryNeeded = true;
+      const colors = color.split(",").map((c) => new RegExp(c.trim(), "i"));
+      variantConditions.push({ name: { $in: colors } });
+    }
+
+    if (size) {
+      variantQueryNeeded = true;
+      const sizes = size
+        .split(",")
+        .map((s) => new RegExp(`\\b${s.trim()}\\b`, "i"));
+      variantConditions.push({ name: { $in: sizes } });
+    }
+
+    let priceOr = null;
+    if (minPrice || maxPrice) {
+      const pCond = {};
+      if (minPrice) pCond.$gte = Number(minPrice);
+      if (maxPrice) pCond.$lte = Number(maxPrice);
+      
+      priceOr = [
+        { price: pCond, sale_price: { $in: [null, 0] } },
+        { sale_price: pCond, sale_price: { $gt: 0 } }
+      ];
+      
+      variantQueryNeeded = true;
+      variantConditions.push({ $or: priceOr });
+    }
+
+    if (variantQueryNeeded) {
+      if (variantConditions.length > 0) {
+        variantQuery.$and = variantConditions;
+      }
+      const matchingVariants =
+        await Varient.find(variantQuery).select("itemId");
+      itemIdsFromVariants = matchingVariants.map((v) => v.itemId);
+    }
+
+    if (color || size) {
+      // Must match variant color/size
+      if (itemIdsFromVariants !== null) {
+        query._id = { $in: itemIdsFromVariants };
+      }
+    } else if (priceOr) {
+      // If only price is filtered, item can match its own price OR via variants
+      query.$or = [
+        { _id: { $in: itemIdsFromVariants || [] } },
+        ...priceOr
+      ];
+    }
+
+    console.log("=== FILTER BY PRICE DEBUG LOGS ===");
+    console.log("minPrice:", minPrice, "maxPrice:", maxPrice);
+    console.log("priceOr:", JSON.stringify(priceOr, null, 2));
+    console.log("itemIdsFromVariants:", itemIdsFromVariants);
+    console.log("Final Query:", JSON.stringify(query, null, 2));
+    console.log("==================================");
 
     const options = generateOptions(req);
     const response = await Item.paginate(query, {

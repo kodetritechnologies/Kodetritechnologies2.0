@@ -6,6 +6,7 @@ import Order from "../../models/ecommerce/order.schema.js";
 import Payment from "../../models/configuration/setting/payment.schema.js";
 import CoupanClaim from "../../models/ecommerce/couponClaim.js";
 import Currency from "../../models/configuration/setting/currency.schema.js";
+import { generateOptions } from "../../helpers/mongooseHelper.js";
 
 export const getPaymentMethods = async (req, res) => {
   try {
@@ -373,3 +374,36 @@ export const getPublicStoreSettings = async (req, res) => {
     });
   }
 };
+
+export const getCustomerOrders = async (req, res) => {
+  try {
+    const { _id } = req.customer;
+    const options = generateOptions(req);
+    options.sort = { createdAt: -1 };
+    options.populate = [
+      { path: "currency" },
+      { path: "order_status" },
+      { path: "payment_status" },
+      { 
+        path: "items", 
+        populate: { path: "featured_image", model: "File" } 
+      }
+    ];
+    
+    const query = { customer: _id, deletedAt: null };
+    const response = await Order.paginate(query, options);
+
+    return res.status(200).json({
+      status: "success",
+      message: "Customer orders fetched successfully",
+      data: response,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      status: "error",
+      message: "Internal server error",
+      error: error.message,
+    });
+  }
+};
+
