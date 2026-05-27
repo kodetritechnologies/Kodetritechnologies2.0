@@ -6,7 +6,7 @@ import { useCart } from "@/utils/context/CartContext";
 import Link from "next/link";
 
 function Header() {
-  const { user } = useContext(AuthContext);
+  const { user, logout } = useContext(AuthContext);
   const { wishlist } = useWishlist();
   const { cart } = useCart();
 
@@ -78,13 +78,76 @@ function Header() {
                 </a>
               </li>
               <li>
-                <Link
-                  href="#sign"
-                  data-bs-toggle="modal"
-                  className="nav-icon-item link"
-                >
-                  <i className="icon icon-User"></i>
-                </Link>
+                {user ? (
+                  <div className="dropdown">
+                    <Link
+                      href="#"
+                      className="nav-icon-item link"
+                      data-bs-toggle="dropdown"
+                      aria-expanded="false"
+                    >
+                      {user?.featured_image?.url ? (
+                        <img
+                          src={user.featured_image.url}
+                          alt={user?.name || "User"}
+                          style={{
+                            width: '36px',
+                            height: '36px',
+                            borderRadius: '50%',
+                            objectFit: 'cover'
+                          }}
+                        />
+                      ) : (
+                        <div
+                          style={{
+                            width: '36px',
+                            height: '36px',
+                            borderRadius: '50%',
+                            backgroundColor: '#000',
+                            color: '#fff',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            fontSize: '16px',
+                            fontWeight: 'bold'
+                          }}
+                        >
+                          {user?.name ? user.name.charAt(0).toUpperCase() : 'U'}
+                        </div>
+                      )}
+                    </Link>
+                    <ul className="dropdown-menu dropdown-menu-end">
+                      <li>
+                        <Link className="dropdown-item" href="/account/profile">
+                          Profile
+                        </Link>
+                      </li>
+                      <li>
+                        <Link className="dropdown-item" href="/account/dashboard">
+                          Dashboard
+                        </Link>
+                      </li>
+                      <li>
+                        <button
+                          className="dropdown-item"
+                          onClick={() => {
+                            if (logout) logout();
+                          }}
+                        >
+                          Log out
+                        </button>
+                      </li>
+                    </ul>
+                  </div>
+                ) : (
+                  <Link
+                    href="#sign"
+                    data-bs-toggle="modal"
+                    className="nav-icon-item link"
+                  >
+                    <i className="icon icon-User"></i>
+                  </Link>
+                )}
               </li>
               <li className="d-none d-sm-block">
                 <Link href="/account/wishlist" className="nav-icon-item link shop-cart">

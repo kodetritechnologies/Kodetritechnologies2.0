@@ -79,9 +79,9 @@ function OrderDetailsPage({ params }) {
             <button className="btn btn-outline-info btn-sm rounded-pill" onClick={handleDownloadInvoice}>
               <i className="fa-solid fa-file-invoice me-2"></i>Download Invoice
             </button>
-            <button className="btn btn-outline-success btn-sm rounded-pill" onClick={() => alert("Tracking feature coming soon!")}>
+            <Link href={`/track-order/${order?._id}`} className="btn btn-outline-success btn-sm rounded-pill">
               <i className="fa-solid fa-truck-fast me-2"></i>Track Order
-            </button>
+            </Link>
             <Link
               href="/account/orders"
               className="btn btn-outline-primary btn-sm rounded-pill"
